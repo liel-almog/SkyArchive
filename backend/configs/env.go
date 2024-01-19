@@ -14,15 +14,16 @@ var (
 )
 
 func InitEnv() {
-	envs = make(map[string]*string)
 	initEnvOnce.Do(func() {
+		envs = make(map[string]*string)
 		env, err := godotenv.Read()
 		if err != nil {
 			panic(err)
 		}
 
 		for key, value := range env {
-			envs[key] = &value
+			env := value
+			envs[key] = &env
 		}
 	})
 }
@@ -34,7 +35,11 @@ func GetAllEnvs() (map[string]string, error) {
 
 	envMap := make(map[string]string)
 	for key, value := range envs {
-		envMap[key] = *value
+
+		// Remeber that go reuse the value variable in the loop
+		// https://medium.com/swlh/use-pointer-of-for-range-loop-variable-in-go-3d3481f7ffc9
+		env := *value
+		envMap[key] = env
 	}
 
 	return envMap, nil

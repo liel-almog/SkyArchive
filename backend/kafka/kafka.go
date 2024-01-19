@@ -3,7 +3,6 @@
 package kafka
 
 import (
-	"fmt"
 	"strings"
 	"sync"
 
@@ -35,7 +34,6 @@ func GetKafkaProducer() *kafka.Writer {
 		}
 
 		brokers := strings.Split(brokersString, ",")
-		fmt.Println(brokers)
 		kafkaProducer = newKafkaProducer(brokers)
 	})
 
