@@ -3,21 +3,21 @@ package services
 import (
 	"context"
 	"fmt"
-	"io"
-	"log"
 	"mime/multipart"
-	"os"
 	"sync"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob"
-	"github.com/lielalmog/be-file-streaming/models"
-	"github.com/lielalmog/be-file-streaming/repositories"
+	"github.com/lielalmog/file-uploader/backend/configs"
+	"github.com/lielalmog/file-uploader/backend/kafka"
+	"github.com/lielalmog/file-uploader/backend/models"
+	"github.com/lielalmog/file-uploader/backend/repositories"
+	segKafka "github.com/segmentio/kafka-go"
 )
 
 type UploadService interface {
 	StartUpload(fileMetadate *models.FileMetadateDTO) (*int64, error)
 	UploadChunk(fileHeader *multipart.FileHeader, id int64, chunkIndex int) error
-	CombineChunksAndUploadToPermanent(id int64) error
+	CompleteUploadEvent(id int64) error
 }
 
 type uploadServiceImpl struct{}
@@ -28,8 +28,8 @@ var (
 )
 
 const (
-	CONTAINER_NAME           = "files"
-	PERMANENT_CONTAINER_NAME = "permanent-files"
+	tempContainerName      = "temp-files"
+	permanentContainerName = "permanent-files"
 )
 
 func (u *uploadServiceImpl) StartUpload(fileMetadate *models.FileMetadateDTO) (*int64, error) {
@@ -37,9 +37,9 @@ func (u *uploadServiceImpl) StartUpload(fileMetadate *models.FileMetadateDTO) (*
 }
 
 func (u *uploadServiceImpl) UploadChunk(fileHeader *multipart.FileHeader, id int64, chunkIndex int) error {
-	connectionString, ok := os.LookupEnv("AZURE_STORAGE_CONNECTION_STRING")
-	if !ok {
-		log.Fatal("the environment variable 'AZURE_STORAGE_CONNECTION_STRING' could not be found")
+	connectionString, err := configs.GetEnv("AZURE_STORAGE_CONNECTION_STRING")
+	if err != nil {
+		return err
 	}
 
 	file, err := fileHeader.Open()
@@ -49,7 +49,7 @@ func (u *uploadServiceImpl) UploadChunk(fileHeader *multipart.FileHeader, id int
 
 	serviceClient, err := azblob.NewClientFromConnectionString(connectionString, nil)
 	blobName := fmt.Sprintf("%d/%d", id, chunkIndex)
-	serviceClient.UploadStream(context.Background(), CONTAINER_NAME, blobName, file, nil)
+	serviceClient.UploadStream(context.Background(), tempContainerName, blobName, file, nil)
 	if err != nil {
 		return err
 	}
@@ -57,61 +57,15 @@ func (u *uploadServiceImpl) UploadChunk(fileHeader *multipart.FileHeader, id int
 	return nil
 }
 
-func (u *uploadServiceImpl) CombineChunksAndUploadToPermanent(id int64) error {
-	connectionString, ok := os.LookupEnv("AZURE_STORAGE_CONNECTION_STRING")
-	if !ok {
-		log.Fatal("the environment variable 'AZURE_STORAGE_CONNECTION_STRING' could not be found")
-	}
+func (u *uploadServiceImpl) CompleteUploadEvent(id int64) error {
+	writer := kafka.GetKafkaProducer()
 
-	serviceClient, err := azblob.NewClientFromConnectionString(connectionString, nil)
-	if err != nil {
-		return err
-	}
-
-	reader, writer := io.Pipe()
-
-	blobPrefix := fmt.Sprintf("%d/", id)
-	pager := serviceClient.NewListBlobsFlatPager(CONTAINER_NAME, &azblob.ListBlobsFlatOptions{
-		Prefix: &blobPrefix,
+	err := writer.WriteMessages(context.Background(), segKafka.Message{
+		Value: []byte(fmt.Sprintf("%d", id)),
+		Topic: kafka.UploadFilesTopic,
 	})
 
-	// This function reads from the reader pipe and uploads the data to the permanent container as a stream
-	go func() {
-		defer reader.Close()
-
-		_, err = serviceClient.UploadStream(context.Background(), PERMANENT_CONTAINER_NAME, fmt.Sprintf("%d", id), reader, nil)
-		if err != nil {
-			log.Fatal(err)
-		}
-	}()
-
-	for pager.More() {
-		// advance to the next page
-		page, err := pager.NextPage(context.Background())
-		if err != nil {
-			return err
-		}
-
-		for _, blob := range page.Segment.BlobItems {
-			// Downloads the chunk from the temporary container and writes it to the pipe
-			blobDownloadResponse, err := serviceClient.DownloadStream(context.Background(), CONTAINER_NAME, *blob.Name, nil)
-			if err != nil {
-				log.Fatal(err)
-			}
-
-			bodyStream := blobDownloadResponse.Body
-			_, err = io.Copy(writer, bodyStream)
-			if err != nil {
-				log.Fatal(err)
-			}
-
-			bodyStream.Close()
-		}
-	}
-
-	writer.Close()
-
-	return nil
+	return err
 }
 
 func newUploadService() *uploadServiceImpl {

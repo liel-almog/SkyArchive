@@ -4,8 +4,8 @@ import (
 	"context"
 	"sync"
 
-	"github.com/lielalmog/be-file-streaming/database"
-	"github.com/lielalmog/be-file-streaming/models"
+	"github.com/lielalmog/file-uploader/backend/database"
+	"github.com/lielalmog/file-uploader/backend/models"
 )
 
 type UploadRepository interface {

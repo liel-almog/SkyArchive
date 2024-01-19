@@ -5,9 +5,9 @@ import (
 	"sync"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/lielalmog/be-file-streaming/configs"
-	"github.com/lielalmog/be-file-streaming/models"
-	"github.com/lielalmog/be-file-streaming/services"
+	"github.com/lielalmog/file-uploader/backend/configs"
+	"github.com/lielalmog/file-uploader/backend/models"
+	"github.com/lielalmog/file-uploader/backend/services"
 )
 
 type UploadController interface {
@@ -86,7 +86,7 @@ func (u *uploadControllerImpl) CompleteUpload(c *fiber.Ctx) error {
 		return fiber.ErrBadRequest
 	}
 
-	if err = u.uploadService.CombineChunksAndUploadToPermanent(id); err != nil {
+	if err := u.uploadService.CompleteUploadEvent(id); err != nil {
 		return err
 	}
 

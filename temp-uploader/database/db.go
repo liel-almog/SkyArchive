@@ -2,10 +2,10 @@ package database
 
 import (
 	"context"
-	"os"
 	"sync"
 
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/lielalmog/file-uploader/backend/configs"
 )
 
 type PostgreSQLpgx struct {
@@ -19,7 +19,12 @@ var (
 
 func newDB() {
 	initDBOnce.Do(func() {
-		pool, err := pgxpool.New(context.Background(), os.Getenv("DATABASE_URL"))
+		dbURL, err := configs.GetEnv("DATABASE_URL")
+		if err != nil {
+			panic(err)
+		}
+
+		pool, err := pgxpool.New(context.Background(), dbURL)
 		if err != nil {
 			panic(err)
 		}

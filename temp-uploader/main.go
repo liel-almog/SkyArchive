@@ -7,17 +7,15 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/joho/godotenv"
-	"github.com/lielalmog/be-file-streaming/server"
+	"github.com/lielalmog/file-uploader/backend/configs"
+	"github.com/lielalmog/file-uploader/backend/server"
 )
 
 func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
 
-	if err := godotenv.Load(); err != nil {
-		log.Fatal("Error loading .env file")
-	}
+	configs.InitEnv()
 
 	// We initialize the database at the beginning of our program
 	go server.Serve()

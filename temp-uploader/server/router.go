@@ -2,7 +2,7 @@ package server
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"github.com/lielalmog/be-file-streaming/routes"
+	"github.com/lielalmog/file-uploader/backend/routes"
 )
 
 func setupRouter(app *fiber.App) {

@@ -1,10 +1,13 @@
 // Create a kafka producer without a topic
 
-package configs
+package kafka
 
 import (
+	"fmt"
+	"strings"
 	"sync"
 
+	"github.com/lielalmog/file-uploader/backend/configs"
 	"github.com/segmentio/kafka-go"
 )
 
@@ -13,11 +16,9 @@ var (
 	initKafkaProducerOnce sync.Once
 )
 
-const UploadFilesTopic = "upload-files"
-
-type KafkaProducer struct {
-	Writer *kafka.Writer
-}
+const (
+	UploadFilesTopic = "file-upload-finalization"
+)
 
 func newKafkaProducer(brokers []string) *kafka.Writer {
 	return &kafka.Writer{
@@ -28,7 +29,14 @@ func newKafkaProducer(brokers []string) *kafka.Writer {
 
 func GetKafkaProducer() *kafka.Writer {
 	initKafkaProducerOnce.Do(func() {
-		kafkaProducer = newKafkaProducer([]string{"localhost:9092"})
+		brokersString, err := configs.GetEnv("KAFKA_BROKERS")
+		if err != nil {
+			panic(err)
+		}
+
+		brokers := strings.Split(brokersString, ",")
+		fmt.Println(brokers)
+		kafkaProducer = newKafkaProducer(brokers)
 	})
 
 	return kafkaProducer

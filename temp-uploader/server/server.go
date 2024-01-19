@@ -6,7 +6,8 @@ import (
 	"log"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/lielalmog/be-file-streaming/database"
+	"github.com/lielalmog/file-uploader/backend/database"
+	"github.com/lielalmog/file-uploader/backend/kafka"
 )
 
 const addr = ":8080"
@@ -27,6 +28,7 @@ func Serve() {
 
 func Shutdown(ctx context.Context) error {
 	database.GetDB().Close()
+	kafka.GetKafkaProducer().Close()
 
 	err := app.Shutdown()
 

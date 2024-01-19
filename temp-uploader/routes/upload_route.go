@@ -2,7 +2,7 @@ package routes
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"github.com/lielalmog/be-file-streaming/controllers"
+	"github.com/lielalmog/file-uploader/backend/controllers"
 )
 
 func NewUploadRouter(app fiber.Router) {
