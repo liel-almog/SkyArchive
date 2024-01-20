@@ -11,30 +11,7 @@ import (
 	"github.com/lielalmog/file-uploader/storage-coordinator/configs"
 )
 
-const (
-	permanentContainerName = "permanent-files"
-	backupContainerName    = "backup-files"
-	tempContainerName      = "temp-files"
-)
-
-func downloadAndCopy(serviceClient *azblob.Client, blobName string, writer *io.PipeWriter) error {
-	blobDownloadResponse, err := serviceClient.DownloadStream(context.Background(), tempContainerName, blobName, nil)
-	if err != nil {
-		return err
-	}
-
-	bodyStream := blobDownloadResponse.Body
-	_, err = io.Copy(writer, bodyStream)
-	if err != nil {
-		return err
-	}
-
-	bodyStream.Close()
-
-	return nil
-}
-
-func combineChunksAndUploadToPermanent(id int64) error {
+func combineChunksAndUploadToStorage(id int64, containerName string) error {
 	connectionString, err := configs.GetEnv("AZURE_STORAGE_CONNECTION_STRING")
 	if err != nil {
 		return err
@@ -56,7 +33,7 @@ func combineChunksAndUploadToPermanent(id int64) error {
 	go func() {
 		defer reader.Close()
 
-		_, err = serviceClient.UploadStream(context.Background(), permanentContainerName, fmt.Sprintf("%d", id), reader, nil)
+		_, err = serviceClient.UploadStream(context.Background(), containerName, fmt.Sprintf("%d", id), reader, nil)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -82,7 +59,18 @@ func combineChunksAndUploadToPermanent(id int64) error {
 	slices.Sort(chunks)
 
 	for _, chunk := range chunks {
-		downloadAndCopy(serviceClient, chunk, writer)
+		blobDownloadResponse, err := serviceClient.DownloadStream(context.Background(), tempContainerName, chunk, nil)
+		if err != nil {
+			return err
+		}
+
+		bodyStream := blobDownloadResponse.Body
+		_, err = io.Copy(writer, bodyStream)
+		if err != nil {
+			return err
+		}
+
+		bodyStream.Close()
 	}
 
 	writer.Close()
