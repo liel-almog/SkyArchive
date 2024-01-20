@@ -7,6 +7,7 @@ export const AntdConfigProvider = ({ children }: PropsWithChildren) => (
     theme={{
       token: {
         colorError: "hsla(0, 84%, 64%, 1)",
+        blue: "#4c65b8",
       },
       cssVar: true,
     }}

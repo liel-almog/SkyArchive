@@ -1,0 +1,34 @@
+.container {
+  background-color: var(--ant-blue-3);
+  border-bottom: 1px solid darken(white, 10%);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  $project-name-color: var(--ant-blue-7);
+
+  .home {
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+    background-color: $project-name-color;
+  }
+  .home:hover {
+    background-color: color-mix(in srgb, $project-name-color, #000 15%);
+  }
+
+  & > div {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    padding-inline: 1rem;
+    & > h1 {
+      font-weight: 600;
+      font-size: 1rem;
+      color: var(--ant-geekblue-1);
+    }
+  }
+
+  & > .username {
+    background-color: var(--ant-blue-5);
+  }
+}
