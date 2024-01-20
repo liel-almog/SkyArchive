@@ -4,7 +4,7 @@
 version: "3"
 
 services:
-  kafka:
+  kafka-server:
     image: docker.io/bitnami/kafka:3.6
     ports:
       - "29092:29092"
@@ -33,8 +33,42 @@ services:
       - DYNAMIC_CONFIG_ENABLED=true
     networks:
       - app-tier
+
+  backend:
+    build:
+      context: backend/
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    networks:
+      - app-tier
+
+  frontend:
+    build:
+      context: frontend/
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    networks:
+      - app-tier
+
+  postgres-db:
+    image: postgres:16-alpine
+    container_name: postgres-db
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_PASSWORD: liel-almog
+    volumes:
+      - postgresvol:/var/lib/postgresql/data
+      - $PWD/docker-entrypoint-initdb.d/:/docker-entrypoint-initdb.d/ # This is where the SQL scripts are located
+    networks:
+      - app-tier
+
 volumes:
   kafka_data:
+    driver: local
+  postgresvol:
     driver: local
 networks:
   app-tier:
