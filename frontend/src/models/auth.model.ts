@@ -17,7 +17,7 @@ export const loginSchema = z.object({
 export type Login = z.infer<typeof loginSchema>;
 
 export const signupSchema = z.object({
-  username: customValidation.english.min(2).max(20),
+  username: customValidation.text.min(1).max(255),
   password: passwordSchema,
   email: customValidation.email,
 });
