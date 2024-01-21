@@ -12,16 +12,16 @@ type UploadRepository interface {
 	SaveFileMetadata(fileMetadate *models.FileMetadateDTO) (*int64, error)
 }
 
-type UploadRepositoryImpl struct {
+type uploadRepositoryImpl struct {
 	db *database.PostgreSQLpgx
 }
 
 var (
 	initUploadRepositoryOnce sync.Once
-	uploadRepository         *UploadRepositoryImpl
+	uploadRepository         *uploadRepositoryImpl
 )
 
-func (u *UploadRepositoryImpl) SaveFileMetadata(fileMetadate *models.FileMetadateDTO) (*int64, error) {
+func (u *uploadRepositoryImpl) SaveFileMetadata(fileMetadate *models.FileMetadateDTO) (*int64, error) {
 	var id *int64
 
 	row := u.db.Pool.QueryRow(context.Background(),
@@ -33,8 +33,8 @@ func (u *UploadRepositoryImpl) SaveFileMetadata(fileMetadate *models.FileMetadat
 	return id, nil
 }
 
-func newUploadRepository() *UploadRepositoryImpl {
-	return &UploadRepositoryImpl{
+func newUploadRepository() *uploadRepositoryImpl {
+	return &uploadRepositoryImpl{
 		db: database.GetDB(),
 	}
 }

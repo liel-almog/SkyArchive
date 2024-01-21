@@ -4,6 +4,9 @@ import (
 	"sync"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/lielalmog/file-uploader/backend/configs"
+	"github.com/lielalmog/file-uploader/backend/models"
+	"github.com/lielalmog/file-uploader/backend/services"
 )
 
 type AuthController interface {
@@ -11,7 +14,9 @@ type AuthController interface {
 	Login(c *fiber.Ctx) error
 }
 
-type authControllerImpl struct{}
+type authControllerImpl struct {
+	authService services.AuthService
+}
 
 var (
 	initAuthControllerOnce sync.Once
@@ -19,6 +24,20 @@ var (
 )
 
 func (a *authControllerImpl) Signup(c *fiber.Ctx) error {
+	signup := new(models.Signup)
+
+	if err := c.BodyParser(signup); err != nil {
+		return fiber.ErrBadRequest
+	}
+
+	if err := configs.GetValidator().Struct(signup); err != nil {
+		return fiber.ErrBadRequest
+	}
+
+	if err := a.authService.Signup(signup); err != nil {
+		return fiber.ErrInternalServerError
+	}
+
 	return nil
 }
 
@@ -27,7 +46,9 @@ func (a *authControllerImpl) Login(c *fiber.Ctx) error {
 }
 
 func newAuthController() *authControllerImpl {
-	return &authControllerImpl{}
+	return &authControllerImpl{
+		authService: services.GetAuthService(),
+	}
 }
 
 func GetAuthController() AuthController {
