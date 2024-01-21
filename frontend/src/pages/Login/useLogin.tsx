@@ -11,15 +11,12 @@ export const useLogin = () => {
     resolver: zodResolver(loginSchema),
   });
 
-  const { handleSubmit } = methods;
-
   const onSubmit: SubmitHandler<Login> = (data) => {
     console.log(data);
   };
 
   return {
     methods,
-    handleSubmit,
     onSubmit,
   };
 };

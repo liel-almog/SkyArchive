@@ -23,3 +23,14 @@ export const signupSchema = z.object({
 });
 
 export type Signup = z.infer<typeof signupSchema>;
+
+export const signupWithConfirmSchema = signupSchema
+  .extend({
+    confirmPassword: passwordSchema,
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "הסיסמאות אינן תואמות",
+    path: ["confirmPassword"],
+  });
+
+export type SignupWithConfirm = z.infer<typeof signupWithConfirmSchema>;
