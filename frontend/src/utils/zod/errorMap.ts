@@ -33,32 +33,21 @@ const textAreaSchema = z.string().trim().max(2000);
 const dateLike = z.union([z.number(), z.string(), z.date()]);
 
 // Backslash does not need to be escaped in character sets.
-const validRegex =
-  /^[a-zA-Z0-9\u0590-\u05FF- \u0020.,?!:'+ /_ \\\- –';"(){}[\] \n\t\r\f\v]*/gu;
-const odateRegex =
-  /^[a-zA-Z0-9\u0590-\u05FF- \u0020.,?!:'+ _/$#@ \\\- –';"(){}[\] \n\t\r\f\v]*/gu;
+const validRegex = /^[a-zA-Z0-9\u0590-\u05FF- \u0020.,?!:'+ /_ \\\- –';"(){}[\] \n\t\r\f\v]*/gu;
+const odateRegex = /^[a-zA-Z0-9\u0590-\u05FF- \u0020.,?!:'+ _/$#@ \\\- –';"(){}[\] \n\t\r\f\v]*/gu;
 
 export const customValidation = {
-  alphabet: stringSchema.regex(
-    /^[a-zA-Z\u0590-\u05FF() ,.'-]*$/i,
-    errorMessages.alphabet
-  ),
+  alphabet: stringSchema.regex(/^[a-zA-Z\u0590-\u05FF() ,.'-]*$/i, errorMessages.alphabet),
   english: stringSchema.regex(/^[a-zA-z]*$/i, errorMessages.english),
   hebrew: stringSchema.regex(/^[\u0590-\u05FF]*$/i, errorMessages.hebrew),
   phone: {
-    localPhone: stringSchema.refine(
-      (str) => validator.isMobilePhone(str, ["he-IL"]),
-      {
-        message: errorMessages.localPhone,
-      }
-    ),
+    localPhone: stringSchema.refine((str) => validator.isMobilePhone(str, ["he-IL"]), {
+      message: errorMessages.localPhone,
+    }),
     optionalLocalPhone: stringSchema
-      .refine(
-        (str) => validator.isMobilePhone(str, ["he-IL"]) || isEmpty(str),
-        {
-          message: errorMessages.localPhone,
-        }
-      )
+      .refine((str) => validator.isMobilePhone(str, ["he-IL"]) || isEmpty(str), {
+        message: errorMessages.localPhone,
+      })
       .nullish(),
   },
   url: z.string().trim().url({ message: errorMessages.url }).max(1000),
@@ -75,13 +64,12 @@ export const customValidation = {
     .min(0, `${errorMessages.minNumber} 0`)
     .max(120, `${errorMessages.maxNumber} 120`)
     .nullish(),
-  number: (options?: { max: number }) =>
-    z
-      .number({ invalid_type_error: "נא להזין מספר תקין" })
-      .int()
-      .min(0)
-      .max(options?.max ? options.max : 9999999999)
-      .transform((value) => Math.round(value)),
+  number: z
+    .number({ invalid_type_error: "נא להזין מספר תקין" })
+    .int()
+    .min(0)
+    .max(1000000000)
+    .transform((value) => Math.round(value)),
   alphanumericHebEn: stringSchema.refine((value: string) => {
     const isHebrew = validator.isAlphanumeric(value, "he", {
       ignore: "-, ",
@@ -97,8 +85,7 @@ export const customValidation = {
     .string()
     .max(50)
     .refine(
-      (value: string) =>
-        validator.isAlphanumeric(value, "en-US", { ignore: "-" }),
+      (value: string) => validator.isAlphanumeric(value, "en-US", { ignore: "-" }),
       errorMessages.aadId
     ),
   enumOption: stringSchema.refine((value: string) => {

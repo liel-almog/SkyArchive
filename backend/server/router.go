@@ -13,5 +13,7 @@ func setupRouter(app *fiber.App) {
 	})
 
 	api := app.Group("/api")
+	routes.NewAuthRouter(api)
+
 	routes.NewUploadRouter(api)
 }
