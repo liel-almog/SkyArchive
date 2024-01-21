@@ -40,6 +40,12 @@
         padding: 0.5rem;
         background-color: black;
       }
+
+      & > p > a {
+        text-align: center;
+        cursor: pointer;
+        text-decoration: underline;
+      }
     }
   }
 }

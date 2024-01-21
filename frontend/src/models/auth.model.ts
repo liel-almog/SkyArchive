@@ -1,16 +1,25 @@
 import { z } from "zod";
+import { customValidation } from "../utils/zod/errorMap";
+
+const passwordSchema = z
+  .string()
+  .trim()
+  .min(8)
+  .regex(/^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*\W)(?!.* ).*$/, {
+    message: "הסיסמה חייבת להכיל אותיות גדולות וקטנות, מספרים ותו מיוחד",
+  });
 
 export const loginSchema = z.object({
-  password: z.string().min(8).max(255),
-  email: z.string().email().min(8).max(255),
+  password: passwordSchema,
+  email: customValidation.email,
 });
 
 export type Login = z.infer<typeof loginSchema>;
 
-export const registerSchema = z.object({
-  username: z.string().min(8).max(255),
-  password: z.string().min(8).max(255),
-  email: z.string().email().min(8).max(255),
+export const signupSchema = z.object({
+  username: customValidation.english.min(2).max(20),
+  password: passwordSchema,
+  email: customValidation.email,
 });
 
-export type Register = z.infer<typeof registerSchema>;
+export type Signup = z.infer<typeof signupSchema>;

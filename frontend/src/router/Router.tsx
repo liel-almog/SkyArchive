@@ -7,6 +7,7 @@ import { BaseErrorBoundary } from "../components/common/BaseErrorBoundary";
 import { useAuthContext } from "../context/AuthContext/useAuthProvider";
 import { Home } from "../pages/Home";
 import { LoginForm } from "../pages/Login";
+import { SignupForm } from "../pages/Signup";
 import { UploadFiles } from "../pages/UploadFiles";
 
 const authenticatedRouter = createBrowserRouter([
@@ -30,9 +31,14 @@ const authenticatedRouter = createBrowserRouter([
 
 const unauthenticatedRouter = createBrowserRouter([
   {
-    path: "/",
+    path: "/login",
     errorElement: <BaseErrorBoundary />,
     element: <LoginForm />,
+  },
+  {
+    path: "/signup",
+    errorElement: <BaseErrorBoundary />,
+    element: <SignupForm />,
   },
   {
     path: "*",

@@ -1,0 +1,40 @@
+.container {
+  display: flex;
+  gap: 0.5rem;
+  flex-direction: column;
+  width: 100%;
+  & > div {
+    width: 100%;
+  }
+}
+
+.input,
+.textArea {
+  padding: 0.5rem;
+  border: 1px solid var(--ant-color-border);
+  direction: initial;
+  text-align: right;
+  direction: rtl;
+}
+
+.inputNumber {
+  width: 100%;
+  padding: 0.3rem;
+}
+
+.container > h4 {
+  font-size: 1rem;
+  padding-right: 0.2rem;
+}
+
+.container {
+  text-align: right;
+}
+
+.helperText {
+  font-weight: 400;
+  font-size: 0.75rem;
+  line-height: 1.66;
+  text-align: right;
+  margin: 0;
+}
