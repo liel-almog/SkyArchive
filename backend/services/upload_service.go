@@ -15,7 +15,7 @@ import (
 )
 
 type UploadService interface {
-	StartUpload(fileMetadate *models.FileMetadateDTO) (*int64, error)
+	StartUpload(fileMetadate *models.UploadFileMetadateDTO) (*int64, error)
 	UploadChunk(fileHeader *multipart.FileHeader, id int64, chunkIndex int) error
 	CompleteUploadEvent(id int64) error
 }
@@ -34,7 +34,7 @@ const (
 	permanentContainerName = "permanent-files"
 )
 
-func (u *uploadServiceImpl) StartUpload(fileMetadate *models.FileMetadateDTO) (*int64, error) {
+func (u *uploadServiceImpl) StartUpload(fileMetadate *models.UploadFileMetadateDTO) (*int64, error) {
 	return u.uploadRepository.SaveFileMetadata(fileMetadate)
 }
 

@@ -9,8 +9,8 @@ import (
 )
 
 type UserRepository interface {
-	SaveUser(*models.Signup) error
-	FindUserByEmail(email string) (*models.User, error)
+	SaveUser(*models.AuthSignup) error
+	FindUserByEmail(email *string) (*models.User, error)
 }
 
 type userRepositoryImpl struct {
@@ -22,8 +22,8 @@ var (
 	userRepository         *userRepositoryImpl
 )
 
-func (repo *userRepositoryImpl) SaveUser(signup *models.Signup) error {
-	_, err := repo.db.Pool.Exec(context.Background(), "INSERT INTO users (email, password, username) VALUES ($1, $2, $3)", signup.Email, signup.Password, signup.Username)
+func (repo *userRepositoryImpl) SaveUser(user *models.AuthSignup) error {
+	_, err := repo.db.Pool.Exec(context.Background(), "INSERT INTO users (email, password, username) VALUES ($1, $2, $3)", user.Email, user.Password, user.Username)
 	if err != nil {
 		return err
 	}
@@ -31,7 +31,7 @@ func (repo *userRepositoryImpl) SaveUser(signup *models.Signup) error {
 	return nil
 }
 
-func (repo *userRepositoryImpl) FindUserByEmail(email string) (*models.User, error) {
+func (repo *userRepositoryImpl) FindUserByEmail(email *string) (*models.User, error) {
 	user := new(models.User)
 
 	err := repo.db.Pool.QueryRow(context.Background(), "SELECT id, email, password, username FROM users WHERE email = $1", email).

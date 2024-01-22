@@ -26,7 +26,7 @@ var (
 )
 
 func (u *uploadControllerImpl) StartUpload(c *fiber.Ctx) error {
-	fileMetadata := new(models.FileMetadateDTO)
+	fileMetadata := new(models.UploadFileMetadateDTO)
 	if err := c.BodyParser(fileMetadata); err != nil {
 		return err
 	}

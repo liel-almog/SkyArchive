@@ -9,7 +9,7 @@ import (
 )
 
 type UploadRepository interface {
-	SaveFileMetadata(fileMetadate *models.FileMetadateDTO) (*int64, error)
+	SaveFileMetadata(fileMetadate *models.UploadFileMetadateDTO) (*int64, error)
 }
 
 type uploadRepositoryImpl struct {
@@ -21,7 +21,7 @@ var (
 	uploadRepository         *uploadRepositoryImpl
 )
 
-func (u *uploadRepositoryImpl) SaveFileMetadata(fileMetadate *models.FileMetadateDTO) (*int64, error) {
+func (u *uploadRepositoryImpl) SaveFileMetadata(fileMetadate *models.UploadFileMetadateDTO) (*int64, error) {
 	var id *int64
 
 	row := u.db.Pool.QueryRow(context.Background(),

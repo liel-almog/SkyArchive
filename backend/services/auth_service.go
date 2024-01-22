@@ -3,19 +3,19 @@ package services
 import (
 	"sync"
 
+	"github.com/lielalmog/file-uploader/backend/errors/apperrors"
 	"github.com/lielalmog/file-uploader/backend/models"
-	"github.com/lielalmog/file-uploader/backend/repositories"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type AuthService interface {
-	Signup(signup *models.Signup) (*string, error)
-	Login(login *models.Login) (*string, error)
+	Signup(signup *models.AuthSignup) (*string, error)
+	Login(login *models.AuthLogin) (*string, error)
 }
 
 type authServiceImpl struct {
-	userRepository repositories.UserRepository
-	jwtService     JWTService
+	userService UserService
+	jwtService  JWTService
 }
 
 var (
@@ -23,7 +23,7 @@ var (
 	authService         *authServiceImpl
 )
 
-func (a *authServiceImpl) Signup(signup *models.Signup) (*string, error) {
+func (a *authServiceImpl) Signup(signup *models.AuthSignup) (*string, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(signup.Password), 14)
 	if err != nil {
 		return nil, err
@@ -31,7 +31,7 @@ func (a *authServiceImpl) Signup(signup *models.Signup) (*string, error) {
 
 	signup.Password = string(bytes)
 
-	if err := a.userRepository.SaveUser(signup); err != nil {
+	if err := a.userService.SaveUser(signup); err != nil {
 		return nil, err
 	}
 
@@ -46,14 +46,18 @@ func (a *authServiceImpl) Signup(signup *models.Signup) (*string, error) {
 	return token, nil
 }
 
-func (a *authServiceImpl) Login(login *models.Login) (*string, error) {
-	user, err := a.userRepository.FindUserByEmail(login.Email)
+func (a *authServiceImpl) Login(login *models.AuthLogin) (*string, error) {
+	user, err := a.userService.GetUserByEmail(&login.Email)
 	if err != nil {
 		return nil, err
 	}
 
+	if user == nil {
+		return nil, apperrors.ErrUserNotFound
+	}
+
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(login.Password)); err != nil {
-		return nil, err
+		return nil, apperrors.ErrInvalidCredentials
 	}
 
 	token, err := a.jwtService.GenerateToken(map[string]interface{}{
@@ -69,8 +73,8 @@ func (a *authServiceImpl) Login(login *models.Login) (*string, error) {
 
 func newAuthService() *authServiceImpl {
 	return &authServiceImpl{
-		userRepository: repositories.GetUserRepository(),
-		jwtService:     GetJWTService(),
+		userService: GetUserService(),
+		jwtService:  GetJWTService(),
 	}
 }
 

@@ -5,8 +5,8 @@ import (
 	"sync"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/lielalmog/file-uploader/backend/configs"
+	"github.com/lielalmog/file-uploader/backend/errors/apperrors"
 	"github.com/lielalmog/file-uploader/backend/models"
 	"github.com/lielalmog/file-uploader/backend/services"
 )
@@ -26,7 +26,7 @@ var (
 )
 
 func (a *authControllerImpl) Signup(c *fiber.Ctx) error {
-	signup := new(models.Signup)
+	signup := new(models.AuthSignup)
 
 	if err := c.BodyParser(signup); err != nil {
 		return fiber.ErrBadRequest
@@ -38,15 +38,11 @@ func (a *authControllerImpl) Signup(c *fiber.Ctx) error {
 
 	token, err := a.authService.Signup(signup)
 	if err != nil {
-		var pgErr *pgconn.PgError
-
-		if errors.As(err, &pgErr) {
-			if pgErr.Code == "23505" {
-				return fiber.ErrConflict
-			}
+		if errors.Is(err, apperrors.ErrUserAlreadyExists) {
+			return fiber.NewError(fiber.StatusConflict, "User already exists")
 		}
 
-		return fiber.ErrInternalServerError
+		return err
 	}
 
 	return c.JSON(fiber.Map{
@@ -55,7 +51,7 @@ func (a *authControllerImpl) Signup(c *fiber.Ctx) error {
 }
 
 func (a *authControllerImpl) Login(c *fiber.Ctx) error {
-	login := new(models.Login)
+	login := new(models.AuthLogin)
 
 	if err := c.BodyParser(login); err != nil {
 		return fiber.ErrBadRequest
@@ -67,6 +63,14 @@ func (a *authControllerImpl) Login(c *fiber.Ctx) error {
 
 	token, err := a.authService.Login(login)
 	if err != nil {
+		if errors.Is(err, apperrors.ErrInvalidCredentials) {
+			return fiber.NewError(fiber.StatusUnauthorized, "Invalid credentials")
+		}
+
+		if errors.Is(err, apperrors.ErrUserNotFound) {
+			return fiber.ErrNotFound
+		}
+
 		return fiber.ErrInternalServerError
 	}
 
