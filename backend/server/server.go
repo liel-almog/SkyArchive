@@ -6,6 +6,7 @@ import (
 	"log"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/lielalmog/file-uploader/backend/database"
 	"github.com/lielalmog/file-uploader/backend/kafka"
 )
@@ -15,7 +16,10 @@ const addr = ":8080"
 var app *fiber.App
 
 func Serve() {
-	app = fiber.New()
+	app = fiber.New(fiber.Config{
+		ErrorHandler: errorHandler,
+	})
+	app.Use(recover.New())
 
 	setupRouter(app)
 
