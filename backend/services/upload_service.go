@@ -20,7 +20,9 @@ type UploadService interface {
 	CompleteUploadEvent(id int64) error
 }
 
-type uploadServiceImpl struct{}
+type uploadServiceImpl struct {
+	uploadRepository repositories.UploadRepository
+}
 
 var (
 	initUploadServiceOnce sync.Once
@@ -33,7 +35,7 @@ const (
 )
 
 func (u *uploadServiceImpl) StartUpload(fileMetadate *models.FileMetadateDTO) (*int64, error) {
-	return repositories.GetUploadRepository().SaveFileMetadata(fileMetadate)
+	return u.uploadRepository.SaveFileMetadata(fileMetadate)
 }
 
 func (u *uploadServiceImpl) UploadChunk(fileHeader *multipart.FileHeader, id int64, chunkIndex int) error {
@@ -69,7 +71,9 @@ func (u *uploadServiceImpl) CompleteUploadEvent(id int64) error {
 }
 
 func newUploadService() *uploadServiceImpl {
-	return &uploadServiceImpl{}
+	return &uploadServiceImpl{
+		uploadRepository: repositories.GetUploadRepository(),
+	}
 }
 
 func GetUploadService() UploadService {
