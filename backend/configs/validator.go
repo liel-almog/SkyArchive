@@ -27,7 +27,8 @@ func passwordValidationFunc(fl validator.FieldLevel) bool {
 		hasUpper.MatchString(fieldValue) &&
 		hasSpecial.MatchString(fieldValue) &&
 		!noSpace.MatchString(fieldValue) &&
-		len(fieldValue) >= 8
+		len(fieldValue) >= 8 &&
+		len(fieldValue) <= 32
 }
 
 func GetValidator() *validator.Validate {

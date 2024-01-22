@@ -10,7 +10,7 @@ import (
 
 type UserRepository interface {
 	SaveUser(*models.Signup) error
-	FindUserByEmail() error
+	FindUserByEmail(email string) (*models.User, error)
 }
 
 type userRepositoryImpl struct {
@@ -31,8 +31,17 @@ func (repo *userRepositoryImpl) SaveUser(signup *models.Signup) error {
 	return nil
 }
 
-func (repo *userRepositoryImpl) FindUserByEmail() error {
-	return nil
+func (repo *userRepositoryImpl) FindUserByEmail(email string) (*models.User, error) {
+	user := new(models.User)
+
+	err := repo.db.Pool.QueryRow(context.Background(), "SELECT id, email, password, username FROM users WHERE email = $1", email).
+		Scan(&user.ID, &user.Email, &user.Password, &user.Username)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return user, nil
 }
 
 func newUserRepository() *userRepositoryImpl {

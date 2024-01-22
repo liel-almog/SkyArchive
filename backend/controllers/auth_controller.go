@@ -1,9 +1,11 @@
 package controllers
 
 import (
+	"errors"
 	"sync"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/lielalmog/file-uploader/backend/configs"
 	"github.com/lielalmog/file-uploader/backend/models"
 	"github.com/lielalmog/file-uploader/backend/services"
@@ -34,15 +36,43 @@ func (a *authControllerImpl) Signup(c *fiber.Ctx) error {
 		return fiber.ErrBadRequest
 	}
 
-	if err := a.authService.Signup(signup); err != nil {
+	token, err := a.authService.Signup(signup)
+	if err != nil {
+		var pgErr *pgconn.PgError
+
+		if errors.As(err, &pgErr) {
+			if pgErr.Code == "23505" {
+				return fiber.ErrConflict
+			}
+		}
+
 		return fiber.ErrInternalServerError
 	}
 
-	return nil
+	return c.JSON(fiber.Map{
+		"token": token,
+	})
 }
 
 func (a *authControllerImpl) Login(c *fiber.Ctx) error {
-	return nil
+	login := new(models.Login)
+
+	if err := c.BodyParser(login); err != nil {
+		return fiber.ErrBadRequest
+	}
+
+	if err := configs.GetValidator().Struct(login); err != nil {
+		return fiber.ErrBadRequest
+	}
+
+	token, err := a.authService.Login(login)
+	if err != nil {
+		return fiber.ErrInternalServerError
+	}
+
+	return c.JSON(fiber.Map{
+		"token": token,
+	})
 }
 
 func newAuthController() *authControllerImpl {
