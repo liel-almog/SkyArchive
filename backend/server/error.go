@@ -7,6 +7,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 	"github.com/jackc/pgx/v5/pgconn"
+	"github.com/lielalmog/file-uploader/backend/errors/pgerrors"
 )
 
 func errorHandler(ctx *fiber.Ctx, err error) error {
@@ -26,7 +27,7 @@ func errorHandler(ctx *fiber.Ctx, err error) error {
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) {
 			switch pgErr.Code {
-			case "23505":
+			case pgerrors.UniqueViolation:
 				code = fiber.StatusConflict
 				message = fiber.ErrConflict.Message
 			default:
@@ -41,8 +42,13 @@ func errorHandler(ctx *fiber.Ctx, err error) error {
 			message = "Bad Request"
 		}
 
-		// Default error handling
+		var validationErr validator.ValidationErrors
+		if errors.As(err, &validationErr) {
+			code = fiber.StatusBadRequest
+			message = "Bad Request"
+		}
 
+		// Default error handling
 		return ctx.Status(code).JSON(fiber.Map{
 			"message":   message,
 			"timestamp": timestamp,
