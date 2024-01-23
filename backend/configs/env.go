@@ -5,6 +5,7 @@ import (
 	"sync"
 
 	"github.com/joho/godotenv"
+	"github.com/lielalmog/file-uploader/backend/errors/apperrors"
 )
 
 var (
@@ -52,7 +53,7 @@ func GetEnv(key string) (string, error) {
 
 	value, ok := envs[key]
 	if !ok {
-		return "", fmt.Errorf("key %s not found", key)
+		return "", fmt.Errorf("%w key %s not found", apperrors.ErrInvalidEnv, key)
 	}
 
 	return *value, nil
