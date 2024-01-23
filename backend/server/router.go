@@ -2,6 +2,7 @@ package server
 
 import (
 	"github.com/gofiber/fiber/v2"
+	"github.com/lielalmog/file-uploader/backend/middleware"
 	"github.com/lielalmog/file-uploader/backend/routes"
 )
 
@@ -15,5 +16,6 @@ func setupRouter(app *fiber.App) {
 	api := app.Group("/api")
 	routes.NewAuthRouter(api)
 
+	api.Use(middleware.Protected())
 	routes.NewUploadRouter(api)
 }

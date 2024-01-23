@@ -18,7 +18,7 @@ type UserService interface {
 	// If an error occurs, the error is returned.
 	GetUserByEmail(email *string) (*models.User, error)
 
-	SaveUser(user *models.AuthSignup) error
+	SaveUser(user *models.AuthSignup) (*int64, error)
 }
 
 type userServiceImpl struct {
@@ -44,20 +44,20 @@ func (service *userServiceImpl) GetUserByEmail(email *string) (*models.User, err
 	return user, nil
 }
 
-func (service *userServiceImpl) SaveUser(user *models.AuthSignup) error {
-	err := service.userRepository.SaveUser(user)
+func (service *userServiceImpl) SaveUser(user *models.AuthSignup) (*int64, error) {
+	id, err := service.userRepository.SaveUser(user)
 	if err != nil {
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) {
 			if pgErr.Code == pgerrors.UniqueViolation {
-				return apperrors.ErrUserAlreadyExists
+				return nil, apperrors.ErrUserAlreadyExists
 			}
 		}
 
-		return err
+		return nil, err
 	}
 
-	return nil
+	return id, nil
 }
 
 func newUserService() *userServiceImpl {

@@ -9,7 +9,7 @@ import (
 )
 
 type UserRepository interface {
-	SaveUser(*models.AuthSignup) error
+	SaveUser(*models.AuthSignup) (*int64, error)
 	FindUserByEmail(email *string) (*models.User, error)
 }
 
@@ -22,19 +22,24 @@ var (
 	userRepository         *userRepositoryImpl
 )
 
-func (repo *userRepositoryImpl) SaveUser(user *models.AuthSignup) error {
-	_, err := repo.db.Pool.Exec(context.Background(), "INSERT INTO users (email, password, username) VALUES ($1, $2, $3)", user.Email, user.Password, user.Username)
-	if err != nil {
-		return err
+func (repo *userRepositoryImpl) SaveUser(user *models.AuthSignup) (*int64, error) {
+	var id *int64
+
+	row := repo.db.Pool.QueryRow(context.Background(),
+		"INSERT INTO users (email, password, username) VALUES ($1, $2, $3) RETURNING user_id",
+		user.Email, user.Password, user.Username)
+
+	if err := row.Scan(&id); err != nil {
+		return nil, err
 	}
 
-	return nil
+	return id, nil
 }
 
 func (repo *userRepositoryImpl) FindUserByEmail(email *string) (*models.User, error) {
 	user := new(models.User)
 
-	err := repo.db.Pool.QueryRow(context.Background(), "SELECT id, email, password, username FROM users WHERE email = $1", email).
+	err := repo.db.Pool.QueryRow(context.Background(), "SELECT user_id, email, password, username FROM users WHERE email = $1", email).
 		Scan(&user.ID, &user.Email, &user.Password, &user.Username)
 
 	if err != nil {

@@ -31,13 +31,15 @@ func (a *authServiceImpl) Signup(signup *models.AuthSignup) (*string, error) {
 
 	signup.Password = string(bytes)
 
-	if err := a.userService.SaveUser(signup); err != nil {
+	id, err := a.userService.SaveUser(signup)
+	if err != nil {
 		return nil, err
 	}
 
 	token, err := a.jwtService.GenerateToken(map[string]interface{}{
 		"email":    signup.Email,
 		"username": signup.Username,
+		"id":       id,
 	})
 	if err != nil {
 		return nil, err
@@ -63,6 +65,7 @@ func (a *authServiceImpl) Login(login *models.AuthLogin) (*string, error) {
 	token, err := a.jwtService.GenerateToken(map[string]interface{}{
 		"email":    user.Email,
 		"username": user.Username,
+		"id":       user.ID,
 	})
 	if err != nil {
 		return nil, err
