@@ -15,12 +15,14 @@ import (
 )
 
 type UploadService interface {
-	StartUpload(fileMetadate *models.FileMetadateDTO) (*int64, error)
+	StartUpload(fileMetadate *models.UploadFileMetadateDTO) (*int64, error)
 	UploadChunk(fileHeader *multipart.FileHeader, id int64, chunkIndex int) error
 	CompleteUploadEvent(id int64) error
 }
 
-type uploadServiceImpl struct{}
+type uploadServiceImpl struct {
+	uploadRepository repositories.UploadRepository
+}
 
 var (
 	initUploadServiceOnce sync.Once
@@ -32,8 +34,8 @@ const (
 	permanentContainerName = "permanent-files"
 )
 
-func (u *uploadServiceImpl) StartUpload(fileMetadate *models.FileMetadateDTO) (*int64, error) {
-	return repositories.GetUploadRepository().SaveFileMetadata(fileMetadate)
+func (u *uploadServiceImpl) StartUpload(fileMetadate *models.UploadFileMetadateDTO) (*int64, error) {
+	return u.uploadRepository.SaveFileMetadata(fileMetadate)
 }
 
 func (u *uploadServiceImpl) UploadChunk(fileHeader *multipart.FileHeader, id int64, chunkIndex int) error {
@@ -69,7 +71,9 @@ func (u *uploadServiceImpl) CompleteUploadEvent(id int64) error {
 }
 
 func newUploadService() *uploadServiceImpl {
-	return &uploadServiceImpl{}
+	return &uploadServiceImpl{
+		uploadRepository: repositories.GetUploadRepository(),
+	}
 }
 
 func GetUploadService() UploadService {

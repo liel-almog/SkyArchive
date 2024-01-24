@@ -5,8 +5,8 @@ import (
 	"github.com/lielalmog/file-uploader/backend/controllers"
 )
 
-func NewUploadRouter(app fiber.Router) {
-	group := app.Group("/upload")
+func NewUploadRouter(router fiber.Router) {
+	group := router.Group("/upload")
 	contoller := controllers.GetUploadController()
 
 	group.Post("/chunk/start", contoller.StartUpload)

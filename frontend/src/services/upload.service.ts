@@ -1,5 +1,5 @@
 import { startUploadSchema } from "../models/upload.model";
-import { axiosInstance } from "./index.service";
+import { authenticatedInstance } from "./index.service";
 
 const PREFIX = "upload" as const;
 
@@ -15,7 +15,7 @@ export class UploadService {
       );
       formData.append("index", chunkIndex.toString());
       formData.append("total", CHUNKS_COUNT.toString());
-      return axiosInstance.post(`/${PREFIX}/chunk/${id}/${chunkIndex}`, formData, {
+      return authenticatedInstance.post(`/${PREFIX}/chunk/${id}/${chunkIndex}`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -33,7 +33,7 @@ export class UploadService {
     const CHUNK_SIZE = 1024 * 1024; // 1MB
     const SIZE = file.size;
     const CHUNKS_COUNT = Math.ceil(SIZE / CHUNK_SIZE);
-    const { data } = await axiosInstance.post(`/${PREFIX}/chunk/start`, {
+    const { data } = await authenticatedInstance.post(`/${PREFIX}/chunk/start`, {
       fileName: file.name,
       size: SIZE,
     });
@@ -44,7 +44,7 @@ export class UploadService {
   }
 
   private async completeUpload(id: number) {
-    await axiosInstance.post(`/${PREFIX}/chunk/complete/${id}`);
+    await authenticatedInstance.post(`/${PREFIX}/chunk/complete/${id}`);
   }
 }
 
