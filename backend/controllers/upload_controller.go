@@ -35,7 +35,7 @@ func (u *uploadControllerImpl) StartUpload(c *fiber.Ctx) error {
 		return err
 	}
 
-	id, err := u.uploadService.StartUpload(fileMetadata)
+	id, err := u.uploadService.StartUpload(c.Context(), fileMetadata)
 	if err != nil {
 		return err
 	}
@@ -71,7 +71,7 @@ func (u *uploadControllerImpl) UploadChunk(c *fiber.Ctx) error {
 		return err
 	}
 
-	u.uploadService.UploadChunk(fileHeader, id, chunkIndex)
+	u.uploadService.UploadChunk(c.Context(), fileHeader, id, chunkIndex)
 
 	return c.SendStatus(fiber.StatusOK)
 }
@@ -86,7 +86,7 @@ func (u *uploadControllerImpl) CompleteUpload(c *fiber.Ctx) error {
 		return fiber.ErrBadRequest
 	}
 
-	if err := u.uploadService.CompleteUploadEvent(id); err != nil {
+	if err := u.uploadService.CompleteUploadEvent(c.Context(), id); err != nil {
 		return err
 	}
 

@@ -1,6 +1,7 @@
 package services
 
 import (
+	"context"
 	"sync"
 
 	"github.com/lielalmog/file-uploader/backend/errors/apperrors"
@@ -9,8 +10,8 @@ import (
 )
 
 type AuthService interface {
-	Signup(signup *models.AuthSignup) (*string, error)
-	Login(login *models.AuthLogin) (*string, error)
+	Signup(ctx context.Context, signup *models.AuthSignup) (*string, error)
+	Login(ctx context.Context, login *models.AuthLogin) (*string, error)
 }
 
 type authServiceImpl struct {
@@ -23,7 +24,7 @@ var (
 	authService         *authServiceImpl
 )
 
-func (a *authServiceImpl) Signup(signup *models.AuthSignup) (*string, error) {
+func (a *authServiceImpl) Signup(ctx context.Context, signup *models.AuthSignup) (*string, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(signup.Password), 14)
 	if err != nil {
 		return nil, err
@@ -31,7 +32,7 @@ func (a *authServiceImpl) Signup(signup *models.AuthSignup) (*string, error) {
 
 	signup.Password = string(bytes)
 
-	id, err := a.userService.SaveUser(signup)
+	id, err := a.userService.SaveUser(ctx, signup)
 	if err != nil {
 		return nil, err
 	}
@@ -48,8 +49,8 @@ func (a *authServiceImpl) Signup(signup *models.AuthSignup) (*string, error) {
 	return token, nil
 }
 
-func (a *authServiceImpl) Login(login *models.AuthLogin) (*string, error) {
-	user, err := a.userService.GetUserByEmail(&login.Email)
+func (a *authServiceImpl) Login(ctx context.Context, login *models.AuthLogin) (*string, error) {
+	user, err := a.userService.GetUserByEmail(ctx, &login.Email)
 	if err != nil {
 		return nil, err
 	}

@@ -3,13 +3,14 @@ package repositories
 import (
 	"context"
 	"sync"
+	"time"
 
 	"github.com/lielalmog/file-uploader/backend/database"
 	"github.com/lielalmog/file-uploader/backend/models"
 )
 
 type UploadRepository interface {
-	SaveFileMetadata(fileMetadate *models.UploadFileMetadateDTO) (*int64, error)
+	SaveFileMetadata(ctx context.Context, fileMetadate *models.UploadFileMetadateDTO) (*int64, error)
 }
 
 type uploadRepositoryImpl struct {
@@ -21,10 +22,13 @@ var (
 	uploadRepository         *uploadRepositoryImpl
 )
 
-func (u *uploadRepositoryImpl) SaveFileMetadata(fileMetadate *models.UploadFileMetadateDTO) (*int64, error) {
+func (u *uploadRepositoryImpl) SaveFileMetadata(ctx context.Context, fileMetadate *models.UploadFileMetadateDTO) (*int64, error) {
 	var id *int64
 
-	row := u.db.Pool.QueryRow(context.Background(),
+	queryCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+
+	row := u.db.Pool.QueryRow(queryCtx,
 		"INSERT INTO files (display_name, original_name, size) VALUES ($1, $1, $2) RETURNING file_id", fileMetadate.FileName, fileMetadate.Size)
 	if err := row.Scan(&id); err != nil {
 		return nil, err

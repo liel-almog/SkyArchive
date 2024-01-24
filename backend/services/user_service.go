@@ -1,6 +1,7 @@
 package services
 
 import (
+	"context"
 	"errors"
 	"sync"
 
@@ -16,9 +17,9 @@ type UserService interface {
 	// GetUserByEmail returns a user by email. If no user is found, nil is returned without error.
 	//
 	// If an error occurs, the error is returned.
-	GetUserByEmail(email *string) (*models.User, error)
+	GetUserByEmail(ctx context.Context, email *string) (*models.User, error)
 
-	SaveUser(user *models.AuthSignup) (*int64, error)
+	SaveUser(ctx context.Context, user *models.AuthSignup) (*int64, error)
 }
 
 type userServiceImpl struct {
@@ -30,8 +31,8 @@ var (
 	userService         *userServiceImpl
 )
 
-func (service *userServiceImpl) GetUserByEmail(email *string) (*models.User, error) {
-	user, err := service.userRepository.FindUserByEmail(email)
+func (service *userServiceImpl) GetUserByEmail(ctx context.Context, email *string) (*models.User, error) {
+	user, err := service.userRepository.FindUserByEmail(ctx, email)
 
 	if errors.Is(err, pgx.ErrNoRows) {
 		return nil, nil
@@ -44,8 +45,8 @@ func (service *userServiceImpl) GetUserByEmail(email *string) (*models.User, err
 	return user, nil
 }
 
-func (service *userServiceImpl) SaveUser(user *models.AuthSignup) (*int64, error) {
-	id, err := service.userRepository.SaveUser(user)
+func (service *userServiceImpl) SaveUser(ctx context.Context, user *models.AuthSignup) (*int64, error) {
+	id, err := service.userRepository.SaveUser(ctx, user)
 	if err != nil {
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) {
