@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"mime/multipart"
 	"sync"
+	"time"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob"
 	"github.com/lielalmog/file-uploader/backend/configs"
@@ -15,9 +16,9 @@ import (
 )
 
 type UploadService interface {
-	StartUpload(fileMetadate *models.UploadFileMetadateDTO) (*int64, error)
-	UploadChunk(fileHeader *multipart.FileHeader, id int64, chunkIndex int) error
-	CompleteUploadEvent(id int64) error
+	StartUpload(ctx context.Context, fileMetadate *models.UploadFileMetadateDTO) (*int64, error)
+	UploadChunk(ctx context.Context, fileHeader *multipart.FileHeader, id int64, chunkIndex int) error
+	CompleteUploadEvent(ctx context.Context, id int64) error
 }
 
 type uploadServiceImpl struct {
@@ -34,11 +35,11 @@ const (
 	permanentContainerName = "permanent-files"
 )
 
-func (u *uploadServiceImpl) StartUpload(fileMetadate *models.UploadFileMetadateDTO) (*int64, error) {
-	return u.uploadRepository.SaveFileMetadata(fileMetadate)
+func (u *uploadServiceImpl) StartUpload(ctx context.Context, fileMetadate *models.UploadFileMetadateDTO) (*int64, error) {
+	return u.uploadRepository.SaveFileMetadata(ctx, fileMetadate)
 }
 
-func (u *uploadServiceImpl) UploadChunk(fileHeader *multipart.FileHeader, id int64, chunkIndex int) error {
+func (u *uploadServiceImpl) UploadChunk(ctx context.Context, fileHeader *multipart.FileHeader, id int64, chunkIndex int) error {
 	connectionString, err := configs.GetEnv("AZURE_STORAGE_CONNECTION_STRING")
 	if err != nil {
 		return err
@@ -49,9 +50,12 @@ func (u *uploadServiceImpl) UploadChunk(fileHeader *multipart.FileHeader, id int
 		return err
 	}
 
+	uploadCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+
 	serviceClient, err := azblob.NewClientFromConnectionString(connectionString, nil)
 	blobName := fmt.Sprintf("%d/%d", id, chunkIndex)
-	serviceClient.UploadStream(context.Background(), tempContainerName, blobName, file, nil)
+	serviceClient.UploadStream(uploadCtx, tempContainerName, blobName, file, nil)
 	if err != nil {
 		return err
 	}
@@ -59,10 +63,13 @@ func (u *uploadServiceImpl) UploadChunk(fileHeader *multipart.FileHeader, id int
 	return nil
 }
 
-func (u *uploadServiceImpl) CompleteUploadEvent(id int64) error {
+func (u *uploadServiceImpl) CompleteUploadEvent(ctx context.Context, id int64) error {
 	writer := kafka.GetKafkaProducer()
 
-	err := writer.WriteMessages(context.Background(), segKafka.Message{
+	writeCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+
+	err := writer.WriteMessages(writeCtx, segKafka.Message{
 		Value: []byte(fmt.Sprintf("%d", id)),
 		Topic: kafka.UploadFilesTopic,
 	})

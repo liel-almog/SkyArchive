@@ -9,8 +9,8 @@ import (
 )
 
 type UserRepository interface {
-	SaveUser(*models.AuthSignup) (*int64, error)
-	FindUserByEmail(email *string) (*models.User, error)
+	SaveUser(ctx context.Context, user *models.AuthSignup) (*int64, error)
+	FindUserByEmail(ctx context.Context, email *string) (*models.User, error)
 }
 
 type userRepositoryImpl struct {
@@ -22,7 +22,7 @@ var (
 	userRepository         *userRepositoryImpl
 )
 
-func (repo *userRepositoryImpl) SaveUser(user *models.AuthSignup) (*int64, error) {
+func (repo *userRepositoryImpl) SaveUser(ctx context.Context, user *models.AuthSignup) (*int64, error) {
 	var id *int64
 
 	row := repo.db.Pool.QueryRow(context.Background(),
@@ -36,7 +36,7 @@ func (repo *userRepositoryImpl) SaveUser(user *models.AuthSignup) (*int64, error
 	return id, nil
 }
 
-func (repo *userRepositoryImpl) FindUserByEmail(email *string) (*models.User, error) {
+func (repo *userRepositoryImpl) FindUserByEmail(ctx context.Context, email *string) (*models.User, error) {
 	user := new(models.User)
 
 	err := repo.db.Pool.QueryRow(context.Background(), "SELECT user_id, email, password, username FROM users WHERE email = $1", email).

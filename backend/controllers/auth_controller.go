@@ -36,7 +36,7 @@ func (a *authControllerImpl) Signup(c *fiber.Ctx) error {
 		return fiber.ErrBadRequest
 	}
 
-	token, err := a.authService.Signup(signup)
+	token, err := a.authService.Signup(c.Context(), signup)
 	if err != nil {
 		if errors.Is(err, apperrors.ErrUserAlreadyExists) {
 			return fiber.NewError(fiber.StatusConflict, "User already exists")
@@ -61,7 +61,7 @@ func (a *authControllerImpl) Login(c *fiber.Ctx) error {
 		return fiber.ErrBadRequest
 	}
 
-	token, err := a.authService.Login(login)
+	token, err := a.authService.Login(c.Context(), login)
 	if err != nil {
 		if errors.Is(err, apperrors.ErrInvalidCredentials) {
 			return fiber.NewError(fiber.StatusUnauthorized, "Invalid credentials")
