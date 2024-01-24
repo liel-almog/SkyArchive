@@ -1,19 +1,34 @@
-import { Login, Signup } from "../models/auth.model";
+import { Login, Signup, tokenSchema } from "../models/auth.model";
 import { axiosInstance } from "./index.service";
 
 const PREFIX = "auth";
 
 export class AuthService {
   async login({ email, password }: Login) {
-    return axiosInstance.post(`/${PREFIX}/login`, { email, password });
+    try {
+      const res = await axiosInstance.post(`/${PREFIX}/login`, {
+        email,
+        password,
+      });
+
+      return tokenSchema.parse(res.data);
+    } catch (error) {
+      throw new Error("Error while logging in");
+    }
   }
 
   async signup({ email, password, username }: Signup) {
-    return axiosInstance.post(`/${PREFIX}/signup`, {
-      email,
-      password,
-      username,
-    });
+    try {
+      const res = await axiosInstance.post(`/${PREFIX}/signup`, {
+        email,
+        password,
+        username,
+      });
+
+      return tokenSchema.parse(res.data);
+    } catch (error) {
+      throw new Error("Error while signing up");
+    }
   }
 }
 

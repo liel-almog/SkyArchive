@@ -15,7 +15,6 @@ export const UploadFiles = () => {
   }) => {
     try {
       let uploadFile: File;
-      console.log(file instanceof File, "is file");
       if (file instanceof File) {
         uploadFile = file;
       } else {
