@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"strconv"
 	"strings"
 	"sync"
@@ -21,6 +22,8 @@ const (
 
 func main() {
 	configs.InitEnv()
+
+	validator := configs.GetValidator()
 
 	var wg sync.WaitGroup
 
@@ -47,26 +50,32 @@ func main() {
 			break
 		}
 
-		// bytes to int64
-		id, err := strconv.ParseInt(string(m.Value), 0, 64)
-		if err != nil {
-			continue
+		payload := new(FileUploadFinalizationMessage)
+
+		if err = json.Unmarshal(m.Value, payload); err != nil {
+			panic(err)
 		}
+
+		if err = validator.Struct(payload); err != nil {
+			panic(err)
+		}
+
+		fileName := strconv.FormatInt(*payload.FileId, 10)
 
 		wg.Add(2)
 		go func() {
-			combineChunksAndUploadToStorage(id, permanentContainerName)
+			combineChunksAndUploadToStorage(fileName, permanentContainerName)
 			w.WriteMessages(context.Background(), kafka.Message{
-				Key:   []byte(strconv.FormatInt(id, 10)),
+				Key:   []byte(fileName),
 				Value: []byte("permanent"),
 			})
 			wg.Done()
 		}()
 
 		go func() {
-			combineChunksAndUploadToStorage(id, backupContainerName)
+			combineChunksAndUploadToStorage(fileName, backupContainerName)
 			w.WriteMessages(context.Background(), kafka.Message{
-				Key:   []byte(strconv.FormatInt(id, 10)),
+				Key:   []byte(fileName),
 				Value: []byte("backup"),
 			})
 			wg.Done()
@@ -74,6 +83,6 @@ func main() {
 
 		// commit the message that was just read
 		wg.Wait()
-		r.CommitMessages(context.Background(), m)
+		// r.CommitMessages(context.Background(), m)
 	}
 }

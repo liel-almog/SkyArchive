@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"strings"
@@ -20,7 +21,7 @@ import (
 type UploadService interface {
 	SaveFileMetadata(ctx context.Context, fileMetadate *models.UploadFileMetadateDTO) (*int64, error)
 	GenerateSasToken(ctx context.Context, fileId *int64) (*string, error)
-	CompleteUploadEvent(ctx context.Context, id int64) error
+	CompleteUploadEvent(ctx context.Context, fileId *int64) error
 }
 
 type uploadServiceImpl struct {
@@ -82,11 +83,11 @@ func (u *uploadServiceImpl) GenerateSasToken(ctx context.Context, fileId *int64)
 
 	token, err := sas.BlobSignatureValues{
 		Protocol:    sas.ProtocolHTTPS,
-		ExpiryTime:  time.Now().Add(1 * time.Hour),
+		ExpiryTime:  time.Now().UTC().Add(3 * time.Hour),
 		Permissions: sasPermissions.String(),
 
 		// Start time 10 minutes ago to avoid clock skew.
-		StartTime:     time.Now().Add(-10 * time.Minute),
+		StartTime:     time.Now().UTC().Add(-10 * time.Minute),
 		ContainerName: tempContainerName,
 		BlobName:      fileName,
 	}.SignWithSharedKey(credential)
@@ -99,15 +100,22 @@ func (u *uploadServiceImpl) GenerateSasToken(ctx context.Context, fileId *int64)
 	return &signedUrl, nil
 }
 
-func (u *uploadServiceImpl) CompleteUploadEvent(ctx context.Context, id int64) error {
+func (u *uploadServiceImpl) CompleteUploadEvent(ctx context.Context, fileId *int64) error {
 	writer := kafka.GetKafkaProducer()
+
+	payload, err := json.Marshal(models.KafkaFileUploadFinalizationMessage{
+		FileId: fileId,
+	})
+	if err != nil {
+		return err
+	}
 
 	writeCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 
-	err := writer.WriteMessages(writeCtx, segKafka.Message{
-		Value: []byte(fmt.Sprintf("%d", id)),
-		Topic: kafka.UploadFilesTopic,
+	err = writer.WriteMessages(writeCtx, segKafka.Message{
+		Value: payload,
+		Topic: kafka.FileUploadFinalizationTopic,
 	})
 
 	return err

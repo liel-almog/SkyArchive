@@ -60,7 +60,7 @@ func (u *uploadControllerImpl) CompleteUpload(c *fiber.Ctx) error {
 		return fiber.ErrBadRequest
 	}
 
-	if err := u.uploadService.CompleteUploadEvent(c.Context(), id); err != nil {
+	if err := u.uploadService.CompleteUploadEvent(c.Context(), &id); err != nil {
 		return err
 	}
 
