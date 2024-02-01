@@ -20,7 +20,6 @@ authenticatedInstance.interceptors.request.use(
     }
 
     const token = JSON.parse(tokenStr);
-    console.log(token);
 
     config.headers.Authorization = `Bearer ${token}`;
 

@@ -12,7 +12,6 @@ import (
 
 type UploadController interface {
 	StartUpload(c *fiber.Ctx) error
-	UploadChunk(c *fiber.Ctx) error
 	CompleteUpload(c *fiber.Ctx) error
 }
 
@@ -35,45 +34,20 @@ func (u *uploadControllerImpl) StartUpload(c *fiber.Ctx) error {
 		return err
 	}
 
-	id, err := u.uploadService.StartUpload(c.Context(), fileMetadata)
+	id, err := u.uploadService.SaveFileMetadata(c.Context(), fileMetadata)
+	if err != nil {
+		return err
+	}
+
+	sasToken, err := u.uploadService.GenerateSasToken(c.Context(), id)
 	if err != nil {
 		return err
 	}
 
 	return c.JSON(fiber.Map{
-		"id": id,
+		"id":        id,
+		"signedUrl": sasToken,
 	})
-}
-
-func (u *uploadControllerImpl) UploadChunk(c *fiber.Ctx) error {
-	// Convert to types
-	id, err := strconv.ParseInt(c.Params("id"), 0, 64)
-	if err != nil {
-		return fiber.ErrBadRequest
-	}
-
-	chunkIndex, err := strconv.Atoi(c.Params("chunkIndex"))
-	if err != nil {
-		return fiber.ErrBadRequest
-	}
-
-	// Validate id and chunkIndex
-	if err := configs.GetValidator().Var(id, "min=1"); err != nil {
-		return fiber.ErrBadRequest
-	}
-
-	if err := configs.GetValidator().Var(chunkIndex, "min=0"); err != nil {
-		return fiber.ErrBadRequest
-	}
-
-	fileHeader, err := c.FormFile("file")
-	if err != nil {
-		return err
-	}
-
-	u.uploadService.UploadChunk(c.Context(), fileHeader, id, chunkIndex)
-
-	return c.SendStatus(fiber.StatusOK)
 }
 
 func (u *uploadControllerImpl) CompleteUpload(c *fiber.Ctx) error {
@@ -86,7 +60,7 @@ func (u *uploadControllerImpl) CompleteUpload(c *fiber.Ctx) error {
 		return fiber.ErrBadRequest
 	}
 
-	if err := u.uploadService.CompleteUploadEvent(c.Context(), id); err != nil {
+	if err := u.uploadService.CompleteUploadEvent(c.Context(), &id); err != nil {
 		return err
 	}
 

@@ -9,7 +9,6 @@ func NewUploadRouter(router fiber.Router) {
 	group := router.Group("/upload")
 	contoller := controllers.GetUploadController()
 
-	group.Post("/chunk/start", contoller.StartUpload)
-	group.Post("/chunk/complete/:id", contoller.CompleteUpload)
-	group.Post("/chunk/:id/:chunkIndex", contoller.UploadChunk)
+	group.Post("/start", contoller.StartUpload)
+	group.Post("/complete/:id", contoller.CompleteUpload)
 }
