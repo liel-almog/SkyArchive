@@ -1,11 +1,10 @@
 .container {
-  background-color: var(--ant-blue-3);
-  border-bottom: 1px solid darken(white, 10%);
+  border-bottom: 1px solid var(--ant-color-border);
   display: flex;
   justify-content: space-between;
   align-items: center;
 
-  $project-name-color: var(--ant-blue-7);
+  $project-name-color: var(--ant-geekblue-1);
 
   .home {
     cursor: pointer;
@@ -24,11 +23,6 @@
     & > h1 {
       font-weight: 600;
       font-size: 1rem;
-      color: var(--ant-geekblue-1);
     }
-  }
-
-  & > .username {
-    background-color: var(--ant-blue-5);
   }
 }

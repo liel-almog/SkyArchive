@@ -1,10 +1,11 @@
 .container {
+  border-radius: var(--ant-border-radius);
   display: flex;
   flex-direction: column;
   align-items: center;
-  height: 100%;
-  width: 100%;
+  justify-content: center;
   gap: 1rem;
+  padding: 1.5rem;
 
   h2 {
     font-size: 2rem;
@@ -17,7 +18,6 @@
     align-items: center;
     justify-content: center;
     gap: 1rem;
-    max-width: 70%;
     width: 100%;
 
     :global {
@@ -25,10 +25,23 @@
         max-width: 70%;
         direction: ltr;
       }
+
+      .ant-upload-drag {
+        background-color: white;
+        border: 2px dashed var(--ant-color-border);
+        padding-inline: 3rem;
+        padding-block: 2rem;
+      }
+    }
+
+    .uploadBtn {
+      background-color: black;
+      color: white;
+      width: 100%;
     }
 
     p {
-      font-size: 1.2rem;
+      font-size: 1rem;
       font-weight: 500;
     }
   }

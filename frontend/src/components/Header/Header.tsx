@@ -10,11 +10,11 @@ export const Header = () => {
 
   return (
     <header className={classes.container}>
-      <div onClick={() => navigate("/")} className={classes.home}>
-        <h1>File Uploader</h1>
-      </div>
       <div className={classes.username}>
         <h1>{user?.username}</h1>
+      </div>
+      <div onClick={() => navigate("/")} className={classes.home}>
+        <h1>Sky Archive</h1>
       </div>
     </header>
   );

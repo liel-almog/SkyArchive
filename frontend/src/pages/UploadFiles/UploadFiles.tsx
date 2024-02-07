@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Button, Upload, UploadProps } from "antd";
 import { uploadService } from "../../services/upload.service";
 import classes from "./upload-files.module.scss";
+import clsx from "clsx";
 const { Dragger } = Upload;
 
 export interface UploadFilesProps {}
@@ -39,17 +40,27 @@ export const UploadFiles = () => {
 
   return (
     <section className={classes.container}>
-      <h2>Upload your files</h2>
-      <Dragger customRequest={handleCustomRequest} className={classes.uploadingSection} multiple>
+      <h2>העלאת קבצים</h2>
+      <Dragger
+        customRequest={handleCustomRequest}
+        className={clsx(classes.uploadingSection)}
+        maxCount={7}
+        multiple
+        listType="picture"
+      >
         <p className="ant-upload-drag-icon">
-          <FontAwesomeIcon color="grey" size="3x" icon={faArrowUpFromBracket} />
+          <FontAwesomeIcon color="grey" size="2x" icon={faArrowUpFromBracket} />
         </p>
         <article className="ant-upload-text">
-          <p>Drag 'n' drop some files here, or click to select files</p>
+          <p>גרור ושחרר קבצים כאן, או לחץ כדי לבחור קבצים</p>
           <br />
         </article>
-        <Button size="large" icon={<FontAwesomeIcon size="lg" icon={faFileUpload} />}>
-          Upload
+        <Button
+          className={classes.uploadBtn}
+          size="large"
+          icon={<FontAwesomeIcon size="lg" icon={faFileUpload} />}
+        >
+          העלאה
         </Button>
       </Dragger>
     </section>
