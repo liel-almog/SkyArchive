@@ -4,9 +4,9 @@ import (
 	"context"
 	"sync"
 
-	"github.com/lielalmog/file-uploader/backend/configs"
-	"github.com/lielalmog/file-uploader/backend/errors/apperrors"
-	"github.com/lielalmog/file-uploader/backend/models"
+	"github.com/lielalmog/SkyArchive/backend/configs"
+	"github.com/lielalmog/SkyArchive/backend/errors/apperrors"
+	"github.com/lielalmog/SkyArchive/backend/models"
 	"golang.org/x/crypto/bcrypt"
 )
 

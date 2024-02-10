@@ -5,7 +5,7 @@ import (
 	"sync"
 
 	"github.com/joho/godotenv"
-	"github.com/lielalmog/file-uploader/backend/errors/apperrors"
+	"github.com/lielalmog/SkyArchive/backend/errors/apperrors"
 )
 
 var (

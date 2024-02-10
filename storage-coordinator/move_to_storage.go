@@ -7,7 +7,7 @@ import (
 
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob"
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob/blob"
-	"github.com/lielalmog/file-uploader/storage-coordinator/configs"
+	"github.com/lielalmog/SkyArchive/storage-coordinator/configs"
 )
 
 func combineChunksAndUploadToStorage(fileName string, destContainerName string) error {

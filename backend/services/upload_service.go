@@ -11,10 +11,10 @@ import (
 
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob"
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob/sas"
-	"github.com/lielalmog/file-uploader/backend/configs"
-	"github.com/lielalmog/file-uploader/backend/kafka"
-	"github.com/lielalmog/file-uploader/backend/models"
-	"github.com/lielalmog/file-uploader/backend/repositories"
+	"github.com/lielalmog/SkyArchive/backend/configs"
+	"github.com/lielalmog/SkyArchive/backend/kafka"
+	"github.com/lielalmog/SkyArchive/backend/models"
+	"github.com/lielalmog/SkyArchive/backend/repositories"
 	segKafka "github.com/segmentio/kafka-go"
 )
 

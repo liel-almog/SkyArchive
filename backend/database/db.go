@@ -5,7 +5,7 @@ import (
 	"sync"
 
 	"github.com/jackc/pgx/v5/pgxpool"
-	"github.com/lielalmog/file-uploader/backend/configs"
+	"github.com/lielalmog/SkyArchive/backend/configs"
 )
 
 type PostgreSQLpgx struct {

@@ -7,8 +7,8 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/recover"
-	"github.com/lielalmog/file-uploader/backend/database"
-	"github.com/lielalmog/file-uploader/backend/kafka"
+	"github.com/lielalmog/SkyArchive/backend/database"
+	"github.com/lielalmog/SkyArchive/backend/kafka"
 )
 
 const addr = ":8080"

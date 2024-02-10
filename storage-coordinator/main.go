@@ -7,7 +7,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/lielalmog/file-uploader/storage-coordinator/configs"
+	"github.com/lielalmog/SkyArchive/storage-coordinator/configs"
 	"github.com/segmentio/kafka-go"
 )
 

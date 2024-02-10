@@ -1,4 +1,4 @@
-module github.com/lielalmog/file-uploader/storage-coordinator
+module github.com/lielalmog/SkyArchive/storage-coordinator
 
 go 1.21.5
 
@@ -18,7 +18,7 @@ require (
 	github.com/klauspost/compress v1.15.9 // indirect
 	github.com/leodido/go-urn v1.2.4 // indirect
 	github.com/pierrec/lz4/v4 v4.1.15 // indirect
-	golang.org/x/crypto v0.16.0 // indirect
+	golang.org/x/crypto v0.17.0 // indirect
 	golang.org/x/net v0.19.0 // indirect
 	golang.org/x/sys v0.15.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
