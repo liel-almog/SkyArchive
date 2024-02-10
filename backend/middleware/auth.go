@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"encoding/json"
 	"errors"
 
 	jwtware "github.com/gofiber/contrib/jwt"
@@ -19,6 +20,23 @@ func Protected() fiber.Handler {
 	return jwtware.New(jwtware.Config{
 		SigningKey:   jwtware.SigningKey{Key: []byte(secret)},
 		ErrorHandler: jwtError,
+		SuccessHandler: func(c *fiber.Ctx) error {
+			mspClaims := c.Locals("user").(*jwt.Token).Claims.(jwt.MapClaims)
+			customClaims := new(configs.CustomJwtClaims)
+
+			jsonData, err := json.Marshal(mspClaims)
+			if err != nil {
+				return err
+			}
+
+			err = json.Unmarshal(jsonData, customClaims)
+			if err != nil {
+				return err
+			}
+
+			c.Locals("userClaims", customClaims)
+			return c.Next()
+		},
 	})
 }
 

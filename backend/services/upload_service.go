@@ -19,7 +19,7 @@ import (
 )
 
 type UploadService interface {
-	SaveFileMetadata(ctx context.Context, fileMetadate *models.UploadFileMetadateDTO) (*int64, error)
+	SaveFileMetadata(ctx context.Context, fileMetadateDTO *models.FileMetadata) (*int64, error)
 	GenerateSasToken(ctx context.Context, fileId *int64) (*string, error)
 	CompleteUploadEvent(ctx context.Context, fileId *int64) error
 }
@@ -55,7 +55,7 @@ func parseAzureStorageConnectionString(connectionString string) (accountName, ac
 	return accountName, accountKey, nil
 }
 
-func (u *uploadServiceImpl) SaveFileMetadata(ctx context.Context, fileMetadate *models.UploadFileMetadateDTO) (*int64, error) {
+func (u *uploadServiceImpl) SaveFileMetadata(ctx context.Context, fileMetadate *models.FileMetadata) (*int64, error) {
 	return u.uploadRepository.SaveFileMetadata(ctx, fileMetadate)
 }
 

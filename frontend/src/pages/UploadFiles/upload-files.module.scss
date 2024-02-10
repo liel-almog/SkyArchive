@@ -6,6 +6,7 @@
   justify-content: center;
   gap: 1rem;
   padding: 1.5rem;
+  max-height: 100%;
 
   h2 {
     font-size: 2rem;
@@ -19,6 +20,7 @@
     justify-content: center;
     gap: 1rem;
     width: 100%;
+    overflow: auto;
 
     :global {
       .ant-upload-list-text {
@@ -31,6 +33,10 @@
         border: 2px dashed var(--ant-color-border);
         padding-inline: 3rem;
         padding-block: 2rem;
+      }
+
+      .ant-upload-list {
+        overflow: auto;
       }
     }
 

@@ -10,7 +10,11 @@ export class UploadService {
 
     const blobClient = new BlobClient(signedUrl);
     const blockBlobClient = blobClient.getBlockBlobClient();
-    await blockBlobClient.uploadData(file);
+    const res = await blockBlobClient.uploadData(file);
+
+    if (res._response.status !== 201) {
+      throw new Error("Error uploading file");
+    }
 
     await this.completeUpload(id);
   }
@@ -20,6 +24,7 @@ export class UploadService {
     const { data } = await authenticatedInstance.post(`/${PREFIX}/start`, {
       fileName: file.name,
       size: SIZE,
+      mimeType: file.type,
     });
 
     return startUploadSchema.parse(data);
