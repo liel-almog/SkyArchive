@@ -5,9 +5,9 @@ import (
 	"sync"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/lielalmog/file-uploader/backend/configs"
-	"github.com/lielalmog/file-uploader/backend/models"
-	"github.com/lielalmog/file-uploader/backend/services"
+	"github.com/lielalmog/SkyArchive/backend/configs"
+	"github.com/lielalmog/SkyArchive/backend/models"
+	"github.com/lielalmog/SkyArchive/backend/services"
 )
 
 type UploadController interface {
@@ -17,6 +17,7 @@ type UploadController interface {
 
 type uploadControllerImpl struct {
 	uploadService services.UploadService
+	jwtService    services.JWTService
 }
 
 var (
@@ -25,13 +26,20 @@ var (
 )
 
 func (u *uploadControllerImpl) StartUpload(c *fiber.Ctx) error {
-	fileMetadata := new(models.UploadFileMetadateDTO)
-	if err := c.BodyParser(fileMetadata); err != nil {
+	fileMetadataDTO := new(models.UploadFileMetadateDTO)
+	if err := c.BodyParser(fileMetadataDTO); err != nil {
 		return err
 	}
 
-	if err := configs.GetValidator().Struct(fileMetadata); err != nil {
+	if err := configs.GetValidator().Struct(fileMetadataDTO); err != nil {
 		return err
+	}
+
+	claims := c.Locals("userClaims").(*configs.CustomJwtClaims)
+
+	fileMetadata := &models.FileMetadata{
+		UserID:                claims.Id,
+		UploadFileMetadateDTO: *fileMetadataDTO,
 	}
 
 	id, err := u.uploadService.SaveFileMetadata(c.Context(), fileMetadata)
@@ -70,6 +78,7 @@ func (u *uploadControllerImpl) CompleteUpload(c *fiber.Ctx) error {
 func newUploadController() *uploadControllerImpl {
 	return &uploadControllerImpl{
 		uploadService: services.GetUploadService(),
+		jwtService:    services.GetJWTService(),
 	}
 }
 

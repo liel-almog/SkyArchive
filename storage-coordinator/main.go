@@ -3,11 +3,13 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"strconv"
 	"strings"
 	"sync"
 
-	"github.com/lielalmog/file-uploader/storage-coordinator/configs"
+	"github.com/lielalmog/SkyArchive/storage-coordinator/configs"
+	"github.com/lielalmog/SkyArchive/storage-coordinator/database"
 	"github.com/segmentio/kafka-go"
 )
 
@@ -22,6 +24,25 @@ const (
 
 func main() {
 	configs.InitEnv()
+	db := database.GetDB()
+
+	connString, err := configs.GetEnv("AZURE_STORAGE_CONNECTION_STRING")
+	if err != nil {
+		panic(err)
+	}
+
+	var stgAccountName string
+
+	connStringParts := strings.Split(connString, ";")
+	for _, part := range connStringParts {
+		if strings.Contains(part, "AccountName") {
+			stgAccountName = strings.Split(part, "=")[1]
+		}
+	}
+
+	if stgAccountName == "" {
+		panic("Storage account name not found in connection string")
+	}
 
 	validator := configs.GetValidator()
 
@@ -81,8 +102,17 @@ func main() {
 			wg.Done()
 		}()
 
-		// commit the message that was just read
 		wg.Wait()
-		// r.CommitMessages(context.Background(), m)
+		r.CommitMessages(context.Background(), m)
+		url := fmt.Sprintf("https://%s.blob.core.windows.net/%s/%s", stgAccountName, permanentContainerName, fileName)
+		if err != nil {
+			panic(err)
+		}
+
+		_, err = db.Pool.Exec(context.Background(), "UPDATE files SET status = 'uploaded', url = $1 WHERE file_id = $2", url, *payload.FileId)
+
+		if err != nil {
+			panic(err)
+		}
 	}
 }

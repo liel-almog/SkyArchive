@@ -4,8 +4,9 @@ import (
 	"context"
 	"sync"
 
-	"github.com/lielalmog/file-uploader/backend/errors/apperrors"
-	"github.com/lielalmog/file-uploader/backend/models"
+	"github.com/lielalmog/SkyArchive/backend/configs"
+	"github.com/lielalmog/SkyArchive/backend/errors/apperrors"
+	"github.com/lielalmog/SkyArchive/backend/models"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -37,11 +38,13 @@ func (a *authServiceImpl) Signup(ctx context.Context, signup *models.AuthSignup)
 		return nil, err
 	}
 
-	token, err := a.jwtService.GenerateToken(map[string]interface{}{
-		"email":    signup.Email,
-		"username": signup.Username,
-		"id":       id,
-	})
+	claims := configs.CustomJwtClaims{
+		Email:    signup.Email,
+		Username: signup.Username,
+		Id:       *id,
+	}
+
+	token, err := a.jwtService.GenerateToken(&claims)
 	if err != nil {
 		return nil, err
 	}
@@ -63,11 +66,13 @@ func (a *authServiceImpl) Login(ctx context.Context, login *models.AuthLogin) (*
 		return nil, apperrors.ErrInvalidCredentials
 	}
 
-	token, err := a.jwtService.GenerateToken(map[string]interface{}{
-		"email":    user.Email,
-		"username": user.Username,
-		"id":       user.ID,
-	})
+	claims := configs.CustomJwtClaims{
+		Email:    user.Email,
+		Username: user.Username,
+		Id:       user.ID,
+	}
+
+	token, err := a.jwtService.GenerateToken(&claims)
 	if err != nil {
 		return nil, err
 	}

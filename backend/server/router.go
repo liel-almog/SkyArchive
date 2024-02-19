@@ -2,8 +2,8 @@ package server
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"github.com/lielalmog/file-uploader/backend/middleware"
-	"github.com/lielalmog/file-uploader/backend/routes"
+	"github.com/lielalmog/SkyArchive/backend/middleware"
+	"github.com/lielalmog/SkyArchive/backend/routes"
 )
 
 func setupRouter(app *fiber.App) {

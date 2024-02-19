@@ -7,8 +7,8 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/lielalmog/file-uploader/backend/configs"
-	"github.com/lielalmog/file-uploader/backend/server"
+	"github.com/lielalmog/SkyArchive/backend/configs"
+	"github.com/lielalmog/SkyArchive/backend/server"
 )
 
 func main() {

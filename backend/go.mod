@@ -1,4 +1,4 @@
-module github.com/lielalmog/file-uploader/backend
+module github.com/lielalmog/SkyArchive/backend
 
 go 1.21.1
 

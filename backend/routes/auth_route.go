@@ -2,7 +2,7 @@ package routes
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"github.com/lielalmog/file-uploader/backend/controllers"
+	"github.com/lielalmog/SkyArchive/backend/controllers"
 )
 
 func NewAuthRouter(router fiber.Router) {

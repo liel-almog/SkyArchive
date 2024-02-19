@@ -1,7 +1,6 @@
 import { Outlet } from "react-router-dom";
-import classes from "./home.module.scss";
-import { Footer } from "../../components/Footer";
 import { Header } from "../../components/Header";
+import classes from "./home.module.scss";
 
 export interface HomeProps {}
 
@@ -12,7 +11,6 @@ export const Home = () => {
       <main>
         <Outlet />
       </main>
-      <Footer />
     </div>
   );
 };
