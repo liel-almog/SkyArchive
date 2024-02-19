@@ -1,42 +1,15 @@
 import { faArrowUpFromBracket, faFileUpload } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Button, Upload, UploadProps } from "antd";
-import { uploadService } from "../../services/upload.service";
-import classes from "./upload-files.module.scss";
+import { Button, Upload } from "antd";
 import clsx from "clsx";
+import classes from "./upload-files.module.scss";
+import { useUploadFiles } from "./useUploadFiles";
 const { Dragger } = Upload;
 
 export interface UploadFilesProps {}
 
 export const UploadFiles = () => {
-  const handleCustomRequest: UploadProps["customRequest"] = async ({
-    file,
-    onSuccess,
-    onError,
-  }) => {
-    try {
-      let uploadFile: File;
-      if (file instanceof File) {
-        uploadFile = file;
-      } else {
-        uploadFile = new File([new Blob([file])], "file");
-      }
-
-      await uploadService.uploadFile(uploadFile);
-
-      if (onSuccess) {
-        onSuccess({
-          status: "success",
-        });
-      }
-    } catch (error) {
-      if (error instanceof Error) {
-        if (onError) {
-          onError(error);
-        }
-      }
-    }
-  };
+  const { handleCustomRequest } = useUploadFiles();
 
   return (
     <section className={classes.container}>

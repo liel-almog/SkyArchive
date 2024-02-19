@@ -17,6 +17,8 @@ export class UploadService {
     }
 
     await this.completeUpload(id);
+
+    return { id };
   }
 
   private async startUpload(file: File) {
