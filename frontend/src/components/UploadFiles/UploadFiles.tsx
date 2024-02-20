@@ -17,7 +17,7 @@ export const UploadFiles = () => {
       <Dragger
         customRequest={handleCustomRequest}
         className={clsx(classes.uploadingSection)}
-        maxCount={7}
+        // maxCount={7}
         multiple
         listType="picture"
       >

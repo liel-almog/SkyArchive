@@ -101,19 +101,6 @@ export const customValidation = {
   uuId: stringSchema.uuid(),
   text: z.string().trim().regex(validRegex, errorMessages.text),
   longText: textAreaSchema.regex(validRegex, errorMessages.text),
-  //   ObjectId: z.preprocess(
-  //     (arg) => {
-  //       if (ObjectId.isValid(arg as any)) {
-  //         // We know that arg is a valid ObjectId
-  //         return new ObjectId(arg as any);
-  //       } else {
-  //         // throw new Error("Not a valid ObjectId");
-  //         return undefined;
-  //       }
-  //     },
-  //     z.instanceof(ObjectId),
-  //     { invalid_type_error: errorMessages.mongoId }
-  //   ),
 } as const;
 
 const CustomErrorMap: z.ZodErrorMap = (error, ctx) => {
