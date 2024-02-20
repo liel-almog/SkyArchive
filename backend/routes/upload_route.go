@@ -5,10 +5,12 @@ import (
 	"github.com/lielalmog/SkyArchive/backend/controllers"
 )
 
-func NewUploadRouter(router fiber.Router) {
-	group := router.Group("/upload")
-	contoller := controllers.GetUploadController()
+func NewFileRouter(router fiber.Router) {
+	group := router.Group("/file")
+	contoller := controllers.GetFileController()
 
-	group.Post("/start", contoller.StartUpload)
-	group.Post("/complete/:id", contoller.CompleteUpload)
+	uploadGroup := group.Group("/upload")
+
+	uploadGroup.Post("/start", contoller.StartFileUpload)
+	uploadGroup.Post("/complete/:id", contoller.CompleteFileUpload)
 }

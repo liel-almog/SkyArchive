@@ -18,19 +18,19 @@ import (
 	segKafka "github.com/segmentio/kafka-go"
 )
 
-type UploadService interface {
+type FileService interface {
 	SaveFileMetadata(ctx context.Context, fileMetadateDTO *models.FileMetadata) (*int64, error)
 	GenerateSasToken(ctx context.Context, fileId *int64) (*string, error)
-	CompleteUploadEvent(ctx context.Context, fileId *int64) error
+	CompleteFileUploadEvent(ctx context.Context, fileId *int64) error
 }
 
-type uploadServiceImpl struct {
-	uploadRepository repositories.UploadRepository
+type fileServiceImpl struct {
+	fileRepository repositories.FileRepository
 }
 
 var (
-	initUploadServiceOnce sync.Once
-	uploadService         *uploadServiceImpl
+	initFileServiceOnce sync.Once
+	fileService         *fileServiceImpl
 )
 
 const (
@@ -55,11 +55,11 @@ func parseAzureStorageConnectionString(connectionString string) (accountName, ac
 	return accountName, accountKey, nil
 }
 
-func (u *uploadServiceImpl) SaveFileMetadata(ctx context.Context, fileMetadate *models.FileMetadata) (*int64, error) {
-	return u.uploadRepository.SaveFileMetadata(ctx, fileMetadate)
+func (u *fileServiceImpl) SaveFileMetadata(ctx context.Context, fileMetadate *models.FileMetadata) (*int64, error) {
+	return u.fileRepository.SaveFileMetadata(ctx, fileMetadate)
 }
 
-func (u *uploadServiceImpl) GenerateSasToken(ctx context.Context, fileId *int64) (*string, error) {
+func (u *fileServiceImpl) GenerateSasToken(ctx context.Context, fileId *int64) (*string, error) {
 	connectionString, err := configs.GetEnv("AZURE_STORAGE_CONNECTION_STRING")
 	if err != nil {
 		return nil, err
@@ -100,7 +100,7 @@ func (u *uploadServiceImpl) GenerateSasToken(ctx context.Context, fileId *int64)
 	return &signedUrl, nil
 }
 
-func (u *uploadServiceImpl) CompleteUploadEvent(ctx context.Context, fileId *int64) error {
+func (u *fileServiceImpl) CompleteFileUploadEvent(ctx context.Context, fileId *int64) error {
 	writer := kafka.GetKafkaProducer()
 
 	payload, err := json.Marshal(models.KafkaFileUploadFinalizationMessage{
@@ -121,16 +121,16 @@ func (u *uploadServiceImpl) CompleteUploadEvent(ctx context.Context, fileId *int
 	return err
 }
 
-func newUploadService() *uploadServiceImpl {
-	return &uploadServiceImpl{
-		uploadRepository: repositories.GetUploadRepository(),
+func newFileService() *fileServiceImpl {
+	return &fileServiceImpl{
+		fileRepository: repositories.GetFileRepository(),
 	}
 }
 
-func GetUploadService() UploadService {
-	initUploadServiceOnce.Do(func() {
-		uploadService = newUploadService()
+func GetFileService() FileService {
+	initFileServiceOnce.Do(func() {
+		fileService = newFileService()
 	})
 
-	return uploadService
+	return fileService
 }

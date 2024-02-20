@@ -10,22 +10,21 @@ import (
 	"github.com/lielalmog/SkyArchive/backend/services"
 )
 
-type UploadController interface {
-	StartUpload(c *fiber.Ctx) error
-	CompleteUpload(c *fiber.Ctx) error
+type FileController interface {
+	StartFileUpload(c *fiber.Ctx) error
+	CompleteFileUpload(c *fiber.Ctx) error
 }
 
-type uploadControllerImpl struct {
-	uploadService services.UploadService
-	jwtService    services.JWTService
+type fileControllerImpl struct {
+	fileService services.FileService
 }
 
 var (
-	initUploadControllerOnce sync.Once
-	uploadController         *uploadControllerImpl
+	initFileControllerOnce sync.Once
+	fileController         *fileControllerImpl
 )
 
-func (u *uploadControllerImpl) StartUpload(c *fiber.Ctx) error {
+func (u *fileControllerImpl) StartFileUpload(c *fiber.Ctx) error {
 	fileMetadataDTO := new(models.UploadFileMetadateDTO)
 	if err := c.BodyParser(fileMetadataDTO); err != nil {
 		return err
@@ -42,12 +41,12 @@ func (u *uploadControllerImpl) StartUpload(c *fiber.Ctx) error {
 		UploadFileMetadateDTO: *fileMetadataDTO,
 	}
 
-	id, err := u.uploadService.SaveFileMetadata(c.Context(), fileMetadata)
+	id, err := u.fileService.SaveFileMetadata(c.Context(), fileMetadata)
 	if err != nil {
 		return err
 	}
 
-	sasToken, err := u.uploadService.GenerateSasToken(c.Context(), id)
+	sasToken, err := u.fileService.GenerateSasToken(c.Context(), id)
 	if err != nil {
 		return err
 	}
@@ -58,7 +57,7 @@ func (u *uploadControllerImpl) StartUpload(c *fiber.Ctx) error {
 	})
 }
 
-func (u *uploadControllerImpl) CompleteUpload(c *fiber.Ctx) error {
+func (u *fileControllerImpl) CompleteFileUpload(c *fiber.Ctx) error {
 	id, err := strconv.ParseInt(c.Params("id"), 0, 64)
 	if err != nil {
 		return fiber.ErrBadRequest
@@ -68,24 +67,23 @@ func (u *uploadControllerImpl) CompleteUpload(c *fiber.Ctx) error {
 		return fiber.ErrBadRequest
 	}
 
-	if err := u.uploadService.CompleteUploadEvent(c.Context(), &id); err != nil {
+	if err := u.fileService.CompleteFileUploadEvent(c.Context(), &id); err != nil {
 		return err
 	}
 
 	return c.SendStatus(fiber.StatusOK)
 }
 
-func newUploadController() *uploadControllerImpl {
-	return &uploadControllerImpl{
-		uploadService: services.GetUploadService(),
-		jwtService:    services.GetJWTService(),
+func newFileController() *fileControllerImpl {
+	return &fileControllerImpl{
+		fileService: services.GetFileService(),
 	}
 }
 
-func GetUploadController() UploadController {
-	initUploadControllerOnce.Do(func() {
-		uploadController = newUploadController()
+func GetFileController() FileController {
+	initFileControllerOnce.Do(func() {
+		fileController = newFileController()
 	})
 
-	return uploadController
+	return fileController
 }

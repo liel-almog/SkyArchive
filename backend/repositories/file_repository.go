@@ -9,20 +9,20 @@ import (
 	"github.com/lielalmog/SkyArchive/backend/models"
 )
 
-type UploadRepository interface {
+type FileRepository interface {
 	SaveFileMetadata(ctx context.Context, fileMetadate *models.FileMetadata) (*int64, error)
 }
 
-type uploadRepositoryImpl struct {
+type fileRepositoryImpl struct {
 	db *database.PostgreSQLpgx
 }
 
 var (
-	initUploadRepositoryOnce sync.Once
-	uploadRepository         *uploadRepositoryImpl
+	initFileRepositoryOnce sync.Once
+	fileRepository         *fileRepositoryImpl
 )
 
-func (u *uploadRepositoryImpl) SaveFileMetadata(ctx context.Context, fileMetadate *models.FileMetadata) (*int64, error) {
+func (u *fileRepositoryImpl) SaveFileMetadata(ctx context.Context, fileMetadate *models.FileMetadata) (*int64, error) {
 	var id *int64
 
 	queryCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
@@ -40,16 +40,16 @@ func (u *uploadRepositoryImpl) SaveFileMetadata(ctx context.Context, fileMetadat
 	return id, nil
 }
 
-func newUploadRepository() *uploadRepositoryImpl {
-	return &uploadRepositoryImpl{
+func newFileRepository() *fileRepositoryImpl {
+	return &fileRepositoryImpl{
 		db: database.GetDB(),
 	}
 }
 
-func GetUploadRepository() UploadRepository {
-	initUploadRepositoryOnce.Do(func() {
-		uploadRepository = newUploadRepository()
+func GetFileRepository() FileRepository {
+	initFileRepositoryOnce.Do(func() {
+		fileRepository = newFileRepository()
 	})
 
-	return uploadRepository
+	return fileRepository
 }
