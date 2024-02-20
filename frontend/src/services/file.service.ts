@@ -2,11 +2,11 @@ import { BlobClient } from "@azure/storage-blob";
 import { startUploadSchema } from "../models/upload.model";
 import { authenticatedInstance } from "./index.service";
 
-const PREFIX = "upload" as const;
+const PREFIX = "file" as const;
 
-export class UploadService {
+export class FileService {
   async uploadFile(file: File) {
-    const { id, signedUrl } = await this.startUpload(file);
+    const { id, signedUrl } = await this.startFileUpload(file);
 
     const blobClient = new BlobClient(signedUrl);
     const blockBlobClient = blobClient.getBlockBlobClient();
@@ -16,14 +16,14 @@ export class UploadService {
       throw new Error("Error uploading file");
     }
 
-    await this.completeUpload(id);
+    await this.completeFileUpload(id);
 
     return { id };
   }
 
-  private async startUpload(file: File) {
+  private async startFileUpload(file: File) {
     const SIZE = file.size;
-    const { data } = await authenticatedInstance.post(`/${PREFIX}/start`, {
+    const { data } = await authenticatedInstance.post(`/${PREFIX}/upload/start`, {
       fileName: file.name,
       size: SIZE,
       mimeType: file.type,
@@ -32,9 +32,9 @@ export class UploadService {
     return startUploadSchema.parse(data);
   }
 
-  private async completeUpload(id: number) {
-    await authenticatedInstance.post(`/${PREFIX}/complete/${id}`);
+  private async completeFileUpload(id: number) {
+    await authenticatedInstance.post(`/${PREFIX}/upload/complete/${id}`);
   }
 }
 
-export const uploadService = new UploadService();
+export const uploadService = new FileService();
