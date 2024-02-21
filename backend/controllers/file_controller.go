@@ -13,6 +13,7 @@ import (
 type FileController interface {
 	StartFileUpload(c *fiber.Ctx) error
 	CompleteFileUpload(c *fiber.Ctx) error
+	GetUserFiles(c *fiber.Ctx) error
 }
 
 type fileControllerImpl struct {
@@ -72,6 +73,20 @@ func (u *fileControllerImpl) CompleteFileUpload(c *fiber.Ctx) error {
 	}
 
 	return c.SendStatus(fiber.StatusOK)
+}
+
+func (u *fileControllerImpl) GetUserFiles(c *fiber.Ctx) error {
+	claims, ok := c.Locals("userClaims").(*configs.CustomJwtClaims)
+	if !ok {
+		return fiber.ErrUnauthorized
+	}
+
+	files, err := u.fileService.GetUserFiles(c.Context(), &claims.Id)
+	if err != nil {
+		return err
+	}
+
+	return c.JSON(files)
 }
 
 func newFileController() *fileControllerImpl {

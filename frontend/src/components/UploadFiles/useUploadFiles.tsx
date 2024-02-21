@@ -1,5 +1,5 @@
 import { UploadProps } from "antd";
-import { uploadService } from "../../services/file.service";
+import { fileService } from "../../services/file.service";
 
 export const useUploadFiles = () => {
   const handleCustomRequest: UploadProps["customRequest"] = async ({
@@ -15,7 +15,7 @@ export const useUploadFiles = () => {
         uploadFile = new File([new Blob([file])], "file");
       }
 
-      await uploadService.uploadFile(uploadFile);
+      await fileService.uploadFile(uploadFile);
 
       if (onSuccess) {
         onSuccess({

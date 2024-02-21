@@ -22,6 +22,7 @@ type FileService interface {
 	SaveFileMetadata(ctx context.Context, fileMetadateDTO *models.FileMetadata) (*int64, error)
 	GenerateSasToken(ctx context.Context, fileId *int64) (*string, error)
 	CompleteFileUploadEvent(ctx context.Context, fileId *int64) error
+	GetUserFiles(ctx context.Context, userId *int64) ([]models.FileResDTO, error)
 }
 
 type fileServiceImpl struct {
@@ -119,6 +120,10 @@ func (u *fileServiceImpl) CompleteFileUploadEvent(ctx context.Context, fileId *i
 	})
 
 	return err
+}
+
+func (u *fileServiceImpl) GetUserFiles(ctx context.Context, userId *int64) ([]models.FileResDTO, error) {
+	return u.fileRepository.GetUserFiles(ctx, userId)
 }
 
 func newFileService() *fileServiceImpl {

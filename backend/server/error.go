@@ -2,6 +2,7 @@ package server
 
 import (
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/go-playground/validator/v10"
@@ -11,6 +12,7 @@ import (
 )
 
 func errorHandler(ctx *fiber.Ctx, err error) error {
+	fmt.Println(err)
 	if err != nil {
 		code := fiber.StatusInternalServerError
 		message := fiber.ErrInternalServerError.Message

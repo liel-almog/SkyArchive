@@ -2,15 +2,18 @@ package repositories
 
 import (
 	"context"
+	"fmt"
 	"sync"
 	"time"
 
+	"github.com/jackc/pgx/v5"
 	"github.com/lielalmog/SkyArchive/backend/database"
 	"github.com/lielalmog/SkyArchive/backend/models"
 )
 
 type FileRepository interface {
 	SaveFileMetadata(ctx context.Context, fileMetadate *models.FileMetadata) (*int64, error)
+	GetUserFiles(ctx context.Context, userId *int64) ([]models.FileResDTO, error)
 }
 
 type fileRepositoryImpl struct {
@@ -38,6 +41,30 @@ func (u *fileRepositoryImpl) SaveFileMetadata(ctx context.Context, fileMetadate 
 	}
 
 	return id, nil
+}
+
+func (u *fileRepositoryImpl) GetUserFiles(ctx context.Context, userId *int64) ([]models.FileResDTO, error) {
+	var files []models.FileResDTO
+
+	queryCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+
+	rows, err := u.db.Pool.Query(queryCtx,
+		`SELECT file_id, display_name, uploaded_at, favorite, size, status
+		 FROM files WHERE user_id = $1`, userId)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	files, err = pgx.CollectRows(rows, pgx.RowToStructByName[models.FileResDTO])
+	if err != nil {
+		return nil, err
+	}
+
+	fmt.Println(files[0])
+
+	return files, nil
 }
 
 func newFileRepository() *fileRepositoryImpl {

@@ -1,5 +1,5 @@
 import { BlobClient } from "@azure/storage-blob";
-import { startUploadSchema } from "../models/upload.model";
+import { fileSchema, startUploadSchema } from "../models/file.model";
 import { authenticatedInstance } from "./index.service";
 
 const PREFIX = "file" as const;
@@ -35,6 +35,12 @@ export class FileService {
   private async completeFileUpload(id: number) {
     await authenticatedInstance.post(`/${PREFIX}/upload/complete/${id}`);
   }
+
+  async getFiles() {
+    const { data } = await authenticatedInstance.get(`/${PREFIX}`);
+
+    return fileSchema.array().parse(data);
+  }
 }
 
-export const uploadService = new FileService();
+export const fileService = new FileService();
