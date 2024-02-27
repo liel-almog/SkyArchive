@@ -8,15 +8,16 @@
   width: 100%;
   border-collapse: collapse;
   height: max-content;
-  border: 1px solid lightgray;
+  // border: 1px solid lightgray;
   overflow-x: auto;
 
   thead {
     tr {
       th {
-        text-align: right;
-        position: sticky;
         top: 0;
+        position: sticky;
+        text-align: right;
+        z-index: 10;
         background-color: #f9f9f9;
         :global {
           .ant-slider {
@@ -32,6 +33,20 @@
           inline: 0.5rem;
         }
         white-space: nowrap;
+
+        &::after {
+          content: "";
+          position: absolute;
+          left: 0;
+          bottom: 0;
+          width: 100%;
+          border-bottom: 1px solid lightgray; /* Your desired border styling */
+          z-index: 20;
+        }
+
+        &:first-child {
+          z-index: 30; /* Ensures that the leftmost header's border isn't overlapped by the pseudo-element */
+        }
       }
     }
   }
@@ -40,10 +55,12 @@
     tr {
       height: auto;
       transition: all 0.2s cubic-bezier(0.075, 0.82, 0.165, 1);
+      border-top: 1px solid lightgray;
+      border-bottom: 1px solid lightgray;
 
       td {
+        text-align: right;
         padding: 1rem;
-        text-align: center;
         min-width: 1rem;
         white-space: nowrap;
         max-width: 40ch;
