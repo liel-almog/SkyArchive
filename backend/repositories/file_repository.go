@@ -2,7 +2,6 @@ package repositories
 
 import (
 	"context"
-	"fmt"
 	"sync"
 	"time"
 
@@ -61,8 +60,6 @@ func (u *fileRepositoryImpl) GetUserFiles(ctx context.Context, userId *int64) ([
 	if err != nil {
 		return nil, err
 	}
-
-	fmt.Println(files[0])
 
 	return files, nil
 }
