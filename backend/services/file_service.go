@@ -23,6 +23,8 @@ type FileService interface {
 	GenerateSasToken(ctx context.Context, fileId *int64) (*string, error)
 	CompleteFileUploadEvent(ctx context.Context, fileId *int64) error
 	GetUserFiles(ctx context.Context, userId *int64) ([]models.FileResDTO, error)
+	UpdateFavorite(ctx context.Context, fileId *int64, userId *int64, updateFavoriteDTO *models.UpdateFavoriteDTO) error
+	UpdateDisplayName(ctx context.Context, fileId *int64, userId *int64, updateDisplayNameDTO *models.UpdateDisplayNameDTO) error
 }
 
 type fileServiceImpl struct {
@@ -124,6 +126,14 @@ func (u *fileServiceImpl) CompleteFileUploadEvent(ctx context.Context, fileId *i
 
 func (u *fileServiceImpl) GetUserFiles(ctx context.Context, userId *int64) ([]models.FileResDTO, error) {
 	return u.fileRepository.GetUserFiles(ctx, userId)
+}
+
+func (u *fileServiceImpl) UpdateFavorite(ctx context.Context, fileId *int64, userId *int64, updateFavoriteDTO *models.UpdateFavoriteDTO) error {
+	return u.fileRepository.UpdateFavorite(ctx, fileId, userId, updateFavoriteDTO)
+}
+
+func (u *fileServiceImpl) UpdateDisplayName(ctx context.Context, fileId *int64, userId *int64, updateDisplayNameDTO *models.UpdateDisplayNameDTO) error {
+	return u.fileRepository.UpdateDisplayName(ctx, fileId, userId, updateDisplayNameDTO)
 }
 
 func newFileService() *fileServiceImpl {

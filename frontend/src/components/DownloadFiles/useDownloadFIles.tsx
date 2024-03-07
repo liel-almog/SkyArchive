@@ -3,14 +3,14 @@ import { useEffect } from "react";
 import { useAuthContext } from "../../context/AuthContext/useAuthProvider";
 import { useGetUserFiles } from "./queries";
 
-export const useDownloadFiles = () => {
+export const useGetFiles = () => {
   const { message } = App.useApp();
   const { user } = useAuthContext();
   if (!user) {
     throw new Error("User not found");
   }
 
-  const query = useGetUserFiles(user.id);
+  const query = useGetUserFiles();
   const { isError, error } = query;
 
   useEffect(() => {

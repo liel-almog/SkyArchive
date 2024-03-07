@@ -21,6 +21,22 @@ export class FileService {
     return { id };
   }
 
+  async downloadFile(id: number) {
+    const { data } = await authenticatedInstance.get(`/${PREFIX}/download/${id}`, {
+      responseType: "blob",
+    });
+
+    return data;
+  }
+
+  async updateDisplayName({ id, displayName }: { id: number; displayName: string }) {
+    await authenticatedInstance.patch(`/${PREFIX}/${id}/display-name`, { displayName });
+  }
+
+  async updateFavorite({ id, favorite }: { id: number; favorite: boolean }) {
+    await authenticatedInstance.patch(`/${PREFIX}/${id}/favorite`, { favorite });
+  }
+
   private async startFileUpload(file: File) {
     const SIZE = file.size;
     const { data } = await authenticatedInstance.post(`/${PREFIX}/upload/start`, {

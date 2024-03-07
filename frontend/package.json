@@ -12,11 +12,12 @@
   "dependencies": {
     "@azure/storage-blob": "^12.17.0",
     "@fortawesome/fontawesome-svg-core": "^6.5.1",
+    "@fortawesome/free-regular-svg-icons": "^6.5.1",
     "@fortawesome/free-solid-svg-icons": "^6.5.1",
     "@fortawesome/react-fontawesome": "^0.2.0",
     "@hookform/resolvers": "^3.3.4",
     "@tanstack/react-query": "^5.17.19",
-    "@tanstack/react-query-devtools": "^5.17.19",
+    "@tanstack/react-query-devtools": "^5.25.0",
     "@tanstack/react-table": "^8.12.0",
     "antd": "^5.12.8",
     "axios": "^1.6.5",

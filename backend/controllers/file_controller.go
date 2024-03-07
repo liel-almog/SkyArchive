@@ -14,6 +14,8 @@ type FileController interface {
 	StartFileUpload(c *fiber.Ctx) error
 	CompleteFileUpload(c *fiber.Ctx) error
 	GetUserFiles(c *fiber.Ctx) error
+	UpdateFavorite(c *fiber.Ctx) error
+	UpdateDisplayName(c *fiber.Ctx) error
 }
 
 type fileControllerImpl struct {
@@ -87,6 +89,62 @@ func (u *fileControllerImpl) GetUserFiles(c *fiber.Ctx) error {
 	}
 
 	return c.JSON(files)
+}
+
+func (u *fileControllerImpl) UpdateFavorite(c *fiber.Ctx) error {
+	updateFavoriteDTO := new(models.UpdateFavoriteDTO)
+	if err := c.BodyParser(updateFavoriteDTO); err != nil {
+		return fiber.ErrBadRequest
+	}
+
+	if err := configs.GetValidator().Struct(updateFavoriteDTO); err != nil {
+		return fiber.ErrBadRequest
+	}
+
+	id, err := strconv.ParseInt(c.Params("id"), 0, 64)
+	if err != nil {
+		return fiber.ErrBadRequest
+	}
+
+	if err := configs.GetValidator().Var(id, "min=1"); err != nil {
+		return fiber.ErrBadRequest
+	}
+
+	claims := c.Locals("userClaims").(*configs.CustomJwtClaims)
+
+	if err := u.fileService.UpdateFavorite(c.Context(), &id, &claims.Id, updateFavoriteDTO); err != nil {
+		return err
+	}
+
+	return c.SendStatus(fiber.StatusOK)
+}
+
+func (u *fileControllerImpl) UpdateDisplayName(c *fiber.Ctx) error {
+	updateDisplayNameDTO := new(models.UpdateDisplayNameDTO)
+	if err := c.BodyParser(updateDisplayNameDTO); err != nil {
+		return fiber.ErrBadRequest
+	}
+
+	if err := configs.GetValidator().Struct(updateDisplayNameDTO); err != nil {
+		return fiber.ErrBadRequest
+	}
+
+	id, err := strconv.ParseInt(c.Params("id"), 0, 64)
+	if err != nil {
+		return fiber.ErrBadRequest
+	}
+
+	if err := configs.GetValidator().Var(id, "min=1"); err != nil {
+		return fiber.ErrBadRequest
+	}
+
+	claims := c.Locals("userClaims").(*configs.CustomJwtClaims)
+
+	if err := u.fileService.UpdateDisplayName(c.Context(), &id, &claims.Id, updateDisplayNameDTO); err != nil {
+		return err
+	}
+
+	return c.SendStatus(fiber.StatusOK)
 }
 
 func newFileController() *fileControllerImpl {

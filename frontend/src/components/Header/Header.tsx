@@ -6,14 +6,20 @@ export interface HeaderProps {}
 
 export const Header = () => {
   const navigate = useNavigate();
-  const { user } = useAuthContext();
+  const { user, handleLogout } = useAuthContext();
 
   return (
     <header className={classes.container}>
       <div className={classes.username}>
         <h1>{user?.username}</h1>
       </div>
-      <div onClick={() => navigate("/")} className={classes.home}>
+      <div
+        onClick={() => {
+          handleLogout();
+          navigate("/");
+        }}
+        className={classes.home}
+      >
         <h1>Sky Archive</h1>
       </div>
     </header>

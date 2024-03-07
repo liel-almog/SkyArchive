@@ -99,3 +99,13 @@
     height: 3.3rem;
   }
 }
+
+.rowActions {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.fileSize {
+  direction: ltr;
+  display: inline-block;
+}

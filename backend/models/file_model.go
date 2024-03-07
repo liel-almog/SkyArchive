@@ -22,3 +22,11 @@ type FileResDTO struct {
 	Size        int64     `json:"size"`
 	Status      string    `json:"status"`
 }
+
+type UpdateFavoriteDTO struct {
+	Favorite bool `json:"favorite" binding:"required" validate:"boolean"`
+}
+
+type UpdateDisplayNameDTO struct {
+	DisplayName string `json:"displayName" binding:"required" validate:"min=1"`
+}
