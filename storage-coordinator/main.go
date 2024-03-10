@@ -105,9 +105,6 @@ func main() {
 		wg.Wait()
 		r.CommitMessages(context.Background(), m)
 		url := fmt.Sprintf("https://%s.blob.core.windows.net/%s/%s", stgAccountName, permanentContainerName, fileName)
-		if err != nil {
-			panic(err)
-		}
 
 		_, err = db.Pool.Exec(context.Background(), "UPDATE files SET status = 'uploaded', url = $1 WHERE file_id = $2", url, *payload.FileId)
 
