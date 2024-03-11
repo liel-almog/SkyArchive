@@ -12,7 +12,6 @@ import { useState } from "react";
 import { File } from "../../../../models/file.model";
 import { fileService } from "../../../../services/file.service";
 import { FileRenameActionModal } from "./FileRenameActionModal";
-import classes from "./file-table-actions.module.scss";
 import { useFavoriteMutation } from "./useFavoriteMutation";
 import { useDeleteMutation } from "./useDeleteMutation";
 
@@ -32,7 +31,7 @@ export const FileTableActions = ({ info }: FileTableActionsProps) => {
   const starIcon = favorite ? faSolidStar : faRegularStar;
   return (
     <>
-      <section className={classes.rowActions}>
+      <section role="actions">
         <Button
           onClick={async () => {
             const { url, fileName } = await fileService.downloadFile(fileId);
