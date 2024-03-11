@@ -1,3 +1,4 @@
+import { Empty, Spin } from "antd";
 import { FilesTable } from "./FilesTable";
 import classes from "./download-files.module.scss";
 import { useGetFiles } from "./useDownloadFIles";
@@ -5,14 +6,31 @@ import { useGetFiles } from "./useDownloadFIles";
 export interface DownloadFilesProps {}
 
 export const DownloadFiles = () => {
-  const {
-    query: { data, isSuccess },
-  } = useGetFiles();
+  const { query } = useGetFiles();
+  const { isSuccess, data, isFetching } = query;
+
+  if (isFetching) {
+    return (
+      <section className={classes.container}>
+        <h2>הקבצים שלך</h2>
+        <Spin />
+      </section>
+    );
+  }
+
+  if (isSuccess) {
+    return (
+      <section className={classes.container}>
+        <h2>הקבצים שלך</h2>
+        <FilesTable files={data} />
+      </section>
+    );
+  }
 
   return (
     <section className={classes.container}>
       <h2>הקבצים שלך</h2>
-      {isSuccess ? <FilesTable files={data} /> : null}
+      <Empty description="אין קבצים" />
     </section>
   );
 };

@@ -9,6 +9,7 @@ import clsx from "clsx";
 import { useController, useFormContext } from "react-hook-form";
 import { HelperText } from "../HelperText";
 import classes from "./input.module.scss";
+import { ComponentProps } from "react";
 
 const { TextArea } = AntInput;
 const { Password } = AntInput;
@@ -20,12 +21,7 @@ export interface ExtraInputProps {
 
 type InputProps = AntInputProp & ExtraInputProps;
 
-export const Input = ({
-  name,
-  label,
-  description = false,
-  ...rest
-}: InputProps) => {
+export const Input = ({ name, label, description = false, ...rest }: InputProps) => {
   const {
     formState: { isSubmitting },
   } = useFormContext();
@@ -67,12 +63,14 @@ export const Input = ({
   );
 };
 
+type InputPasswordProps = ComponentProps<typeof Password> & ExtraInputProps;
+
 export const InputPassword = ({
   name,
   label,
   description = false,
   ...rest
-}: InputProps) => {
+}: InputPasswordProps) => {
   const {
     formState: { isSubmitting },
   } = useFormContext();
@@ -116,12 +114,7 @@ export const InputPassword = ({
 
 type InputNumberProps = AntInputNumberProps & ExtraInputProps;
 
-export const InputNumber = ({
-  name,
-  label,
-  description = false,
-  ...rest
-}: InputNumberProps) => {
+export const InputNumber = ({ name, label, description = false, ...rest }: InputNumberProps) => {
   const {
     formState: { isSubmitting },
   } = useFormContext();
@@ -224,10 +217,7 @@ export const DumbInput = ({ className, ...rest }: AntInputProp) => (
   <AntInput className={clsx(classes.input, className)} {...rest} />
 );
 
-export const DumbInputNumber = ({
-  className,
-  ...rest
-}: AntInputNumberProps) => (
+export const DumbInputNumber = ({ className, ...rest }: AntInputNumberProps) => (
   <AntInputNumber
     inputMode="numeric"
     type="number"
