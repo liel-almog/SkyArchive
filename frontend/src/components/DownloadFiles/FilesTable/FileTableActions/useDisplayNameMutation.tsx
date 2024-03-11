@@ -4,12 +4,17 @@ import { filesKeys } from "../../queries";
 import { File } from "../../../../models/file.model";
 import { App } from "antd";
 
-export const useDisplayNameMutation = () => {
+export interface UseDisplayNameMutationProps {
+  id: string;
+}
+
+export const useDisplayNameMutation = ({ id }: UseDisplayNameMutationProps) => {
   const queryClient = useQueryClient();
   const { message } = App.useApp();
 
   const mutation = useMutation({
     mutationFn: fileService.updateDisplayName,
+    mutationKey: ["update-display-name", id],
     onMutate: async (variables) => {
       const { getFilesKey: getFiles } = filesKeys;
 

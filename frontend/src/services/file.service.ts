@@ -1,5 +1,5 @@
 import { BlobClient } from "@azure/storage-blob";
-import { fileSchema, startUploadSchema } from "../models/file.model";
+import { fileDownloadSchema, fileSchema, startUploadSchema } from "../models/file.model";
 import { authenticatedInstance } from "./index.service";
 
 const PREFIX = "file" as const;
@@ -22,11 +22,23 @@ export class FileService {
   }
 
   async downloadFile(id: number) {
-    const { data } = await authenticatedInstance.get(`/${PREFIX}/download/${id}`, {
-      responseType: "blob",
-    });
+    const { data } = await authenticatedInstance.get(`/${PREFIX}/download/${id}`);
+    const { fileName, signedUrl } = fileDownloadSchema.parse(data);
+    const blobClient = new BlobClient(signedUrl);
+    const blobDownloadRes = await blobClient.download();
+    const blob = await blobDownloadRes.blobBody;
 
-    return data;
+    if (!blob) {
+      throw new Error("Error downloading file");
+    }
+
+    const url = window.URL.createObjectURL(blob);
+
+    return { url, fileName };
+  }
+
+  async deleteFile({ id }: { id: number }) {
+    await authenticatedInstance.delete(`/${PREFIX}/${id}`);
   }
 
   async updateDisplayName({ id, displayName }: { id: number; displayName: string }) {

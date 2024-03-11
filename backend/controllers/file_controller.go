@@ -16,6 +16,8 @@ type FileController interface {
 	GetUserFiles(c *fiber.Ctx) error
 	UpdateFavorite(c *fiber.Ctx) error
 	UpdateDisplayName(c *fiber.Ctx) error
+	DeleteFile(c *fiber.Ctx) error
+	DownloadFile(c *fiber.Ctx) error
 }
 
 type fileControllerImpl struct {
@@ -145,6 +147,57 @@ func (u *fileControllerImpl) UpdateDisplayName(c *fiber.Ctx) error {
 	}
 
 	return c.SendStatus(fiber.StatusOK)
+}
+
+func (u *fileControllerImpl) DeleteFile(c *fiber.Ctx) error {
+	id, err := strconv.ParseInt(c.Params("id"), 0, 64)
+	if err != nil {
+		return fiber.ErrBadRequest
+	}
+
+	if err := configs.GetValidator().Var(id, "min=1"); err != nil {
+		return fiber.ErrBadRequest
+	}
+
+	claims := c.Locals("userClaims").(*configs.CustomJwtClaims)
+
+	if err := u.fileService.DeleteFile(c.Context(), &id, &claims.Id); err != nil {
+		return err
+	}
+
+	return c.SendStatus(fiber.StatusOK)
+}
+
+func (u *fileControllerImpl) DownloadFile(c *fiber.Ctx) error {
+	id, err := strconv.ParseInt(c.Params("id"), 0, 64)
+	if err != nil {
+		return fiber.ErrBadRequest
+	}
+
+	if err := configs.GetValidator().Var(id, "min=1"); err != nil {
+		return fiber.ErrBadRequest
+	}
+
+	claims := c.Locals("userClaims").(*configs.CustomJwtClaims)
+
+	file, err := u.fileService.GetFileByUser(c.Context(), &id, &claims.Id)
+	if err != nil {
+		return err
+	}
+
+	if file == nil {
+		return fiber.ErrNotFound
+	}
+
+	sasToken, err := u.fileService.GenerateSasToken(c.Context(), &id)
+	if err != nil {
+		return err
+	}
+
+	return c.JSON(fiber.Map{
+		"signedUrl": sasToken,
+		"fileName":  file.DisplayName,
+	})
 }
 
 func newFileController() *fileControllerImpl {

@@ -11,6 +11,7 @@ import (
 
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob"
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob/sas"
+	"github.com/gofiber/fiber/v2"
 	"github.com/lielalmog/SkyArchive/backend/configs"
 	"github.com/lielalmog/SkyArchive/backend/kafka"
 	"github.com/lielalmog/SkyArchive/backend/models"
@@ -25,6 +26,8 @@ type FileService interface {
 	GetUserFiles(ctx context.Context, userId *int64) ([]models.FileResDTO, error)
 	UpdateFavorite(ctx context.Context, fileId *int64, userId *int64, updateFavoriteDTO *models.UpdateFavoriteDTO) error
 	UpdateDisplayName(ctx context.Context, fileId *int64, userId *int64, updateDisplayNameDTO *models.UpdateDisplayNameDTO) error
+	DeleteFile(ctx context.Context, fileId *int64, userId *int64) error
+	GetFileByUser(ctx context.Context, fileId *int64, userId *int64) (*models.File, error)
 }
 
 type fileServiceImpl struct {
@@ -129,11 +132,69 @@ func (u *fileServiceImpl) GetUserFiles(ctx context.Context, userId *int64) ([]mo
 }
 
 func (u *fileServiceImpl) UpdateFavorite(ctx context.Context, fileId *int64, userId *int64, updateFavoriteDTO *models.UpdateFavoriteDTO) error {
-	return u.fileRepository.UpdateFavorite(ctx, fileId, userId, updateFavoriteDTO)
+	n, err := u.fileRepository.UpdateFavorite(ctx, fileId, userId, updateFavoriteDTO)
+
+	if err != nil {
+		return err
+	}
+
+	if n != 1 {
+		return fiber.NewError(fiber.StatusNotFound, "file not found")
+	}
+
+	return nil
 }
 
 func (u *fileServiceImpl) UpdateDisplayName(ctx context.Context, fileId *int64, userId *int64, updateDisplayNameDTO *models.UpdateDisplayNameDTO) error {
-	return u.fileRepository.UpdateDisplayName(ctx, fileId, userId, updateDisplayNameDTO)
+	n, err := u.fileRepository.UpdateDisplayName(ctx, fileId, userId, updateDisplayNameDTO)
+
+	if err != nil {
+		return err
+	}
+
+	if n != 1 {
+		return fiber.NewError(fiber.StatusNotFound, "file not found")
+	}
+
+	return nil
+}
+
+func (u *fileServiceImpl) DeleteFile(ctx context.Context, fileId *int64, userId *int64) error {
+	n, err := u.fileRepository.DeleteFile(ctx, fileId, userId)
+	if err != nil {
+		return err
+	}
+
+	if n == 0 {
+		return fiber.NewError(fiber.StatusNotFound, "file not found")
+	}
+
+	writer := kafka.GetKafkaProducer()
+
+	payload, err := json.Marshal(models.KafkaFileUploadFinalizationMessage{
+		FileId: fileId,
+	})
+	if err != nil {
+		return err
+	}
+
+	writeCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+
+	err = writer.WriteMessages(writeCtx, segKafka.Message{
+		Value: payload,
+		Topic: kafka.FileDeleteTopic,
+	})
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (u *fileServiceImpl) GetFileByUser(ctx context.Context, fileId *int64, userId *int64) (*models.File, error) {
+	return u.fileRepository.GetFileByUser(ctx, fileId, userId)
 }
 
 func newFileService() *fileServiceImpl {

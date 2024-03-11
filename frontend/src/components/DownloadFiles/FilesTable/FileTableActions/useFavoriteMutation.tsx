@@ -4,12 +4,17 @@ import { filesKeys } from "../../queries";
 import { File } from "../../../../models/file.model";
 import { App } from "antd";
 
-export const useFavoriteMutation = () => {
+export interface UseFavoriteMutationProps {
+  id: string;
+}
+
+export const useFavoriteMutation = ({ id }: UseFavoriteMutationProps) => {
   const queryClient = useQueryClient();
   const { message } = App.useApp();
 
   const mutation = useMutation({
     mutationFn: fileService.updateFavorite,
+    mutationKey: ["update-favorite", id],
     onMutate: async (variables) => {
       const { getFilesKey: getFiles } = filesKeys;
 

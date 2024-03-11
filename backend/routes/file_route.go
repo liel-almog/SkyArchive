@@ -12,6 +12,8 @@ func NewFileRouter(router fiber.Router) {
 	group.Get("/", contoller.GetUserFiles)
 	group.Patch("/:id/favorite", contoller.UpdateFavorite)
 	group.Patch("/:id/display-name", contoller.UpdateDisplayName)
+	group.Delete("/:id", contoller.DeleteFile)
+	group.Get("/download/:id", contoller.DownloadFile)
 
 	uploadGroup := group.Group("/upload")
 

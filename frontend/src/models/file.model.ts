@@ -16,3 +16,8 @@ export const fileSchema = z.object({
 });
 
 export type File = z.infer<typeof fileSchema>;
+
+export const fileDownloadSchema = z.object({
+  signedUrl: z.string().url(),
+  fileName: z.string(),
+});

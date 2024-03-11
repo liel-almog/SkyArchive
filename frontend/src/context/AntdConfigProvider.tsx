@@ -8,9 +8,15 @@ export const AntdConfigProvider = ({ children }: PropsWithChildren) => (
       token: {
         colorError: "hsla(0, 84%, 64%, 1)",
         blue: "#4c65b8",
+        colorPrimary: "black",
         fontFamily: "Noto Sans Hebrew",
       },
       cssVar: true,
+      components: {
+        Input: {
+          activeShadow: "none",
+        },
+      },
     }}
     direction="rtl"
     locale={locale}

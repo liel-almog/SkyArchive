@@ -16,7 +16,9 @@ export const FileRenameActionModal = ({
   fileId,
 }: FileRenameActionModalProps) => {
   const [displayName, setDisplayName] = useState(originalDisplayName);
-  const { mutation: displayNameMutation } = useDisplayNameMutation();
+  const { mutation: displayNameMutation } = useDisplayNameMutation({
+    id: fileId.toString(),
+  });
 
   const handleRename = () => {
     setIsRenameModalOpen(false);
