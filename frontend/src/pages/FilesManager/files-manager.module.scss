@@ -1,0 +1,28 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+
+  .tabs {
+    height: 100%;
+    width: 100%;
+  }
+
+  :global {
+    .ant-tabs-tabpane {
+      height: 100%;
+      max-height: 100%;
+    }
+
+    .ant-tabs-content {
+      height: 100%;
+      max-height: 100%;
+    }
+
+    .ant-upload-list-item-name {
+      max-width: 60ch;
+    }
+  }
+}

@@ -17,6 +17,7 @@ var (
 
 const (
 	FileUploadFinalizationTopic = "file-upload-finalization"
+	FileDeleteTopic             = "file-delete"
 )
 
 func newKafkaProducer(brokers []string) *kafka.Writer {

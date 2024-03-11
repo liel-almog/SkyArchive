@@ -31,8 +31,9 @@
       .ant-upload-drag {
         background-color: white;
         border: 2px dashed var(--ant-color-border);
-        padding-inline: 3rem;
+        padding-inline: 2rem;
         padding-block: 2rem;
+        max-width: fit-content;
       }
 
       .ant-upload-list {

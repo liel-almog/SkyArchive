@@ -17,5 +17,5 @@ func setupRouter(app *fiber.App) {
 	routes.NewAuthRouter(api)
 
 	api.Use(middleware.Protected())
-	routes.NewUploadRouter(api)
+	routes.NewFileRouter(api)
 }
