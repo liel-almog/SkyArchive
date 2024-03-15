@@ -7,9 +7,9 @@ export interface DownloadFilesProps {}
 
 export const DownloadFiles = () => {
   const { query } = useGetFiles();
-  const { isSuccess, data, isFetching } = query;
+  const { isSuccess, data, isLoading } = query;
 
-  if (isFetching) {
+  if (isLoading) {
     return (
       <section className={classes.container}>
         <h2>הקבצים שלך</h2>

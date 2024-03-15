@@ -31,6 +31,7 @@ export const UploadFiles = () => {
         <Button
           className={classes.uploadBtn}
           size="large"
+          type="primary"
           icon={<FontAwesomeIcon size="lg" icon={faFileUpload} />}
         >
           העלאה
