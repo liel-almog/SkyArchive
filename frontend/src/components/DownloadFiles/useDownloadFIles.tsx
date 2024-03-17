@@ -16,7 +16,7 @@ export const useGetFiles = () => {
   useEffect(() => {
     if (isError && error) {
       message.error({
-        content: error.message,
+        content: "לא ניתן לטעון את הקבצים, אנא נסה שוב מאוחר יותר.",
         key: "get-user-files",
       });
     }

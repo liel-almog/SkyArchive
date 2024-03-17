@@ -7,19 +7,21 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { CellContext } from "@tanstack/react-table";
-import { Button } from "antd";
+import { App, Button } from "antd";
 import { useState } from "react";
 import { File } from "../../../../models/file.model";
 import { fileService } from "../../../../services/file.service";
 import { FileRenameActionModal } from "./FileRenameActionModal";
-import { useFavoriteMutation } from "./useFavoriteMutation";
 import { useDeleteMutation } from "./useDeleteMutation";
+import { useFavoriteMutation } from "./useFavoriteMutation";
 
 export interface FileTableActionsProps {
   info: CellContext<File, unknown>;
 }
 
 export const FileTableActions = ({ info }: FileTableActionsProps) => {
+  const { modal } = App.useApp();
+
   const [isRenameModelOpen, setIsRenameModalOpen] = useState(false);
 
   const { favorite, fileId, displayName } = info.row.original;
@@ -29,6 +31,20 @@ export const FileTableActions = ({ info }: FileTableActionsProps) => {
   const { mutation: deleteMutation } = useDeleteMutation({ id: fileId.toString() });
 
   const starIcon = favorite ? faSolidStar : faRegularStar;
+
+  const showDeleteConfirm = () => {
+    modal.confirm({
+      title: "האם אתה בטוח שברצונך למחוק את הקובץ?",
+      okText: "מחק",
+      okType: "danger",
+      cancelText: "ביטול",
+      onOk() {
+        deleteMutation.mutate({ id: fileId });
+      },
+      onCancel() {},
+    });
+  };
+
   return (
     <>
       <section role="actions">
@@ -66,7 +82,7 @@ export const FileTableActions = ({ info }: FileTableActionsProps) => {
           type="text"
         />
         <Button
-          onClick={() => deleteMutation.mutate({ id: fileId })}
+          onClick={showDeleteConfirm}
           icon={<FontAwesomeIcon icon={faTrash} />}
           shape="circle"
           type="text"

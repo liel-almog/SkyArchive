@@ -28,10 +28,7 @@
           white-space: normal;
         }
         user-select: none;
-        padding: {
-          block: 0.5rem;
-          inline: 0.5rem;
-        }
+        padding: 0.5rem;
         white-space: nowrap;
 
         &::after {
@@ -72,7 +69,7 @@
 
       td {
         text-align: right;
-        padding: 1rem;
+        padding: 0.5rem;
         min-width: 1rem;
         white-space: nowrap;
         max-width: 40ch;

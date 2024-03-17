@@ -25,12 +25,22 @@ export const columns = [
   }),
   columnHelper.accessor("uploadedAt", {
     header: "תאריך העלאה",
-    cell: (info) => info.getValue().toISOString(),
+    cell: (info) =>
+      info
+        .getValue()
+        .toLocaleDateString("he-IL", { year: "numeric", month: "2-digit", day: "2-digit" }),
     size: 100,
   }),
   columnHelper.accessor("status", {
     header: "סטטוס",
-    cell: (info) => info.getValue(),
+    cell: (info) => {
+      const v = info.getValue();
+      if (v === "PROCESSING") {
+        return "בהעלאה";
+      } else if (v === "UPLOADED") {
+        return "הועלה";
+      }
+    },
   }),
   columnHelper.accessor("size", {
     header: "גודל",
