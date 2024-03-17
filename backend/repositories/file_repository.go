@@ -8,6 +8,7 @@ import (
 	"github.com/jackc/pgx/v5"
 	"github.com/lielalmog/SkyArchive/backend/database"
 	"github.com/lielalmog/SkyArchive/backend/models"
+	"gopkg.in/errgo.v2/errors"
 )
 
 type FileRepository interface {
@@ -16,7 +17,7 @@ type FileRepository interface {
 	UpdateFavorite(ctx context.Context, fileId *int64, userId *int64, updateFavorite *models.UpdateFavoriteDTO) (int64, error)
 	UpdateDisplayName(ctx context.Context, fileId *int64, userId *int64, updateDisplayName *models.UpdateDisplayNameDTO) (int64, error)
 	GetFileByUser(ctx context.Context, fileId *int64, userId *int64) (*models.File, error)
-	DeleteFile(ctx context.Context, fileId *int64, userId *int64) (int64, error)
+	DeleteFile(ctx context.Context, ch <-chan error, fileId *int64, userId *int64) (int64, error)
 }
 
 type fileRepositoryImpl struct {
@@ -121,19 +122,47 @@ func (u *fileRepositoryImpl) GetFileByUser(ctx context.Context, fileId *int64, u
 	return file, nil
 }
 
-func (u *fileRepositoryImpl) DeleteFile(ctx context.Context, fileId *int64, userId *int64) (int64, error) {
+func (u *fileRepositoryImpl) DeleteFile(ctx context.Context, ch <-chan error, fileId *int64, userId *int64) (int64, error) {
 	queryCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 
-	commandTag, err := u.db.Pool.Exec(queryCtx,
-		`DELETE FROM files 
-		WHERE file_id = $1 AND user_id = $2`,
-		fileId, userId)
+	tx, err := u.db.Pool.Begin(queryCtx)
 	if err != nil {
 		return 0, err
 	}
 
-	return commandTag.RowsAffected(), nil
+	commandTag, err := tx.Exec(queryCtx,
+		`DELETE FROM files
+		WHERE file_id = $1 AND user_id = $2`,
+		fileId, userId)
+
+	if err != nil {
+		tx.Rollback(queryCtx)
+		return 0, err
+	}
+
+	select {
+	case err := <-ch:
+		if err != nil {
+			tx.Rollback(queryCtx)
+			return 0, err
+		}
+
+		err = tx.Commit(queryCtx)
+		if err != nil {
+			return 0, err
+		}
+
+		return commandTag.RowsAffected(), nil
+
+	case <-time.After(5 * time.Second):
+		tx.Rollback(queryCtx)
+		return 0, errors.New("timeout")
+
+	case <-queryCtx.Done():
+		tx.Rollback(queryCtx)
+		return 0, errors.New("timeout")
+	}
 }
 
 func newFileRepository() *fileRepositoryImpl {

@@ -160,34 +160,44 @@ func (u *fileServiceImpl) UpdateDisplayName(ctx context.Context, fileId *int64, 
 }
 
 func (u *fileServiceImpl) DeleteFile(ctx context.Context, fileId *int64, userId *int64) error {
-	n, err := u.fileRepository.DeleteFile(ctx, fileId, userId)
+	writer := kafka.GetKafkaProducer()
+
+	kafkaResult := make(chan error)
+
+	go func() {
+		defer close(kafkaResult)
+
+		payload, err := json.Marshal(models.KafkaFileUploadFinalizationMessage{
+			FileId: fileId,
+		})
+		if err != nil {
+			kafkaResult <- err
+			return
+		}
+
+		writeCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
+		defer cancel()
+
+		err = writer.WriteMessages(writeCtx, segKafka.Message{
+			Value: payload,
+			Topic: kafka.FileDeleteTopic,
+		})
+
+		if err != nil {
+			kafkaResult <- err
+			return
+		}
+
+		kafkaResult <- nil
+	}()
+
+	n, err := u.fileRepository.DeleteFile(ctx, kafkaResult, fileId, userId)
 	if err != nil {
 		return err
 	}
 
 	if n == 0 {
 		return fiber.NewError(fiber.StatusNotFound, "file not found")
-	}
-
-	writer := kafka.GetKafkaProducer()
-
-	payload, err := json.Marshal(models.KafkaFileUploadFinalizationMessage{
-		FileId: fileId,
-	})
-	if err != nil {
-		return err
-	}
-
-	writeCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
-	defer cancel()
-
-	err = writer.WriteMessages(writeCtx, segKafka.Message{
-		Value: payload,
-		Topic: kafka.FileDeleteTopic,
-	})
-
-	if err != nil {
-		return err
 	}
 
 	return nil

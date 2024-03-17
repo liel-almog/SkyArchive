@@ -34,7 +34,7 @@ export const useDeleteMutation = ({ id }: UseDeleteMutationProps) => {
       }
 
       message.error({
-        content: "Error deleting file",
+        content: "שגיאה בעת מחיקת הקובץ",
         key: "delete-file",
       });
     },

@@ -6,12 +6,14 @@ export const startUploadSchema = z.object({
   signedUrl: z.string(),
 });
 
+export const uploadStatuses = ["UPLOADED", "PROCESSING"] as const;
+
 export const fileSchema = z.object({
   fileId: z.number().int().min(1),
   displayName: z.string(),
   uploadedAt: customValidation.dateLikeToDate,
   favorite: z.boolean(),
-  status: z.string(),
+  status: z.enum(uploadStatuses),
   size: z.number().int().min(1),
 });
 
