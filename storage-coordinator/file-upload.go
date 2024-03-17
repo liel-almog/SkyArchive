@@ -116,7 +116,7 @@ func fileUpload(connString string) {
 	r := kafka.NewReader(kafka.ReaderConfig{
 		Brokers: strings.Split(brokers, ","),
 		Topic:   fileUplaodFinilizationTopic,
-		GroupID: "delete-permanent-backup",
+		GroupID: "upload-permanent-backup",
 	})
 
 	for {
@@ -148,11 +148,11 @@ func fileUpload(connString string) {
 			wg.Done()
 		}()
 
+		url := fmt.Sprintf("https://%s.blob.core.windows.net/%s/%s", stgAccountName, permanentContainerName, fileName)
+		_, err = db.Pool.Exec(context.Background(), "UPDATE files SET status = 'uploaded', url = $1 WHERE file_id = $2", url, *payload.FileId)
+
 		wg.Wait()
 		r.CommitMessages(context.Background(), m)
-		url := fmt.Sprintf("https://%s.blob.core.windows.net/%s/%s", stgAccountName, permanentContainerName, fileName)
-
-		_, err = db.Pool.Exec(context.Background(), "UPDATE files SET status = 'uploaded', url = $1 WHERE file_id = $2", url, *payload.FileId)
 
 		if err != nil {
 			panic(err)

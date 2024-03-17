@@ -38,7 +38,7 @@ func fileDelete(connString string) {
 	r := kafka.NewReader(kafka.ReaderConfig{
 		Brokers: strings.Split(brokers, ","),
 		Topic:   fileDeleteTopic,
-		GroupID: "upload-permanent-backup",
+		GroupID: "delete-permanent-backup",
 	})
 
 	for {
