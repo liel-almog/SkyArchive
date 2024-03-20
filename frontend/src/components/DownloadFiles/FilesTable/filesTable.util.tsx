@@ -22,6 +22,8 @@ export const columns = [
     header: "שם קובץ",
     cell: (info) => info.getValue(),
     size: 100,
+    sortingFn: "alphanumeric",
+    sortDescFirst: true,
   }),
   columnHelper.accessor("uploadedAt", {
     header: "תאריך העלאה",
