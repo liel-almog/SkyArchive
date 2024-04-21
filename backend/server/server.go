@@ -11,7 +11,7 @@ import (
 	"github.com/lielalmog/SkyArchive/backend/kafka"
 )
 
-const addr = ":8080"
+const addr = ":5000"
 
 var app *fiber.App
 
