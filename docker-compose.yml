@@ -34,34 +34,34 @@ services:
     networks:
       - app-tier
 
-  backend:
-    build:
-      context: backend/
-      dockerfile: ./Dockerfile
-    ports:
-      - "8080:8080"
-    networks:
-      - app-tier
-    environment:
-      - DATABASE_URL=postgres://postgres:liel-almog@postgres-db:5432/SkyArchive
+  # backend:
+  #   build:
+  #     context: backend/
+  #     dockerfile: ./Dockerfile
+  #   ports:
+  #     - "8080:8080"
+  #   networks:
+  #     - app-tier
+  #   environment:
+  #     - DATABASE_URL=postgres://postgres:liel-almog@postgres-db:5432/SkyArchive
 
-  frontend:
-    build:
-      context: frontend/
-      dockerfile: ./Dockerfile
-    ports:
-      - "5173:5173"
-    networks:
-      - app-tier
+  # frontend:
+  #   build:
+  #     context: frontend/
+  #     dockerfile: ./Dockerfile
+  #   ports:
+  #     - "5173:5173"
+  #   networks:
+  #     - app-tier
 
-  storage-coordinator:
-    build:
-      context: storage-coordinator/
-      dockerfile: Dockerfile
-    networks:
-      - app-tier
-    environment:
-      - DATABASE_URL=postgres://postgres:liel-almog@postgres-db:5432/SkyArchive
+  # storage-coordinator:
+  #   build:
+  #     context: storage-coordinator/
+  #     dockerfile: Dockerfile
+  #   networks:
+  #     - app-tier
+  #   environment:
+  #     - DATABASE_URL=postgres://postgres:liel-almog@postgres-db:5432/SkyArchive
 
   postgres-db:
     image: postgres:16-alpine

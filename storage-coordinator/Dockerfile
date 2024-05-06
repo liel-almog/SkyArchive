@@ -15,6 +15,7 @@ RUN go mod download
 RUN go build -o ./tmp/main .
 
 # Final stage
+
 FROM alpine:latest
 
 # Set working directory
