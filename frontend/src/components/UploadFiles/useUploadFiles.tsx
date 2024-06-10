@@ -1,7 +1,9 @@
 import { UploadProps } from "antd";
 import { fileService } from "../../services/file.service";
+import { useQueryClient } from "@tanstack/react-query";
 
 export const useUploadFiles = () => {
+  const queryClient = useQueryClient()
   const handleCustomRequest: UploadProps["customRequest"] = async ({
     file,
     onSuccess,
@@ -16,6 +18,9 @@ export const useUploadFiles = () => {
       }
 
       await fileService.uploadFile(uploadFile);
+      await queryClient.refetchQueries({
+        queryKey: ["files"]
+      })
 
       if (onSuccess) {
         onSuccess({

@@ -21,6 +21,7 @@ import (
 
 type FileService interface {
 	SaveFileMetadata(ctx context.Context, fileMetadateDTO *models.FileMetadata) (*int64, error)
+	// The file id is the uuid of the metadata in the SQL and the generated token is specifically for this file.
 	GenerateSasToken(ctx context.Context, fileId *int64) (*string, error)
 	CompleteFileUploadEvent(ctx context.Context, fileId *int64) error
 	GetUserFiles(ctx context.Context, userId *int64) ([]models.FileResDTO, error)
@@ -84,7 +85,7 @@ func (u *fileServiceImpl) GenerateSasToken(ctx context.Context, fileId *int64) (
 
 	// create a SAS token that's valid for one hour.
 	// since this is a network call, there's a timeout.
-	sasPermissions := sas.BlobPermissions{Create: true, Add: true, Write: true, Read: true, Delete: true, List: true}
+	sasPermissions := sas.BlobPermissions{Create: true, Add: true, Write: true}
 	fileName := fmt.Sprintf("%d", *fileId)
 
 	token, err := sas.BlobSignatureValues{

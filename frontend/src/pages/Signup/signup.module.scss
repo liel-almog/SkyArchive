@@ -19,12 +19,13 @@
 
     .header {
       text-align: right;
-      & > h1 {
+
+      &>h1 {
         font-size: x-large;
         font-weight: 600;
       }
 
-      & > p {
+      &>p {
         color: var(--ant-color-text-secondary);
       }
     }
@@ -34,15 +35,16 @@
       flex-direction: column;
       gap: 1rem;
 
-      & > button {
+      &>button {
         cursor: pointer;
         border-radius: var(--ant-border-radius);
         width: 100%;
         padding: 0.5rem;
         background-color: black;
+        color: white;
       }
 
-      & > p > a {
+      &>p>a {
         text-align: center;
         cursor: pointer;
         text-decoration: underline;

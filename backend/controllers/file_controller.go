@@ -56,6 +56,7 @@ func (u *fileControllerImpl) StartFileUpload(c *fiber.Ctx) error {
 		return err
 	}
 
+	// Send SAS token and id to the client to upload the file to the temp blob storage
 	return c.JSON(fiber.Map{
 		"id":        id,
 		"signedUrl": sasToken,

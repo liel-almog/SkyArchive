@@ -6,12 +6,13 @@ import (
 	"log"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/lielalmog/SkyArchive/backend/database"
 	"github.com/lielalmog/SkyArchive/backend/kafka"
 )
 
-const addr = ":5000"
+const addr = ":8080"
 
 var app *fiber.App
 
@@ -20,6 +21,12 @@ func Serve() {
 		ErrorHandler: errorHandler,
 	})
 	app.Use(recover.New())
+
+	app.Use(cors.New(cors.Config{
+		AllowOriginsFunc: func(origin string) bool {
+			return true
+		},
+	}))
 
 	setupRouter(app)
 
