@@ -85,7 +85,7 @@ func (u *fileServiceImpl) GenerateSasToken(ctx context.Context, fileId *int64) (
 
 	// create a SAS token that's valid for one hour.
 	// since this is a network call, there's a timeout.
-	sasPermissions := sas.BlobPermissions{Create: true, Add: true, Write: true}
+	sasPermissions := sas.BlobPermissions{Create: true, Add: true, Write: true, Read: true, Delete: true}
 	fileName := fmt.Sprintf("%d", *fileId)
 
 	token, err := sas.BlobSignatureValues{
