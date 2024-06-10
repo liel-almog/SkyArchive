@@ -33,17 +33,6 @@ export const columns = [
         .toLocaleDateString("he-IL", { year: "numeric", month: "2-digit", day: "2-digit" }),
     size: 100,
   }),
-  columnHelper.accessor("status", {
-    header: "סטטוס",
-    cell: (info) => {
-      const v = info.getValue();
-      if (v === "PROCESSING") {
-        return "בהעלאה";
-      } else if (v === "UPLOADED") {
-        return "הועלה";
-      }
-    },
-  }),
   columnHelper.accessor("size", {
     header: "גודל",
     cell: (info) => <span className={classes.fileSize}>{formatBytes(info.getValue())}</span>,
