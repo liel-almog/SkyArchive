@@ -29,3 +29,4 @@ EXPOSE 8080
 
 # Run the application
 CMD [ "./tmp/main" ]
+
