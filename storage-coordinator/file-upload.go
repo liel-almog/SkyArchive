@@ -149,7 +149,7 @@ func fileUpload(connString string) {
 		}()
 
 		url := fmt.Sprintf("https://%s.blob.core.windows.net/%s/%s", stgAccountName, permanentContainerName, fileName)
-		_, err = db.Pool.Exec(context.Background(), "UPDATE files SET status = 'uploaded', url = $1 WHERE file_id = $2", url, *payload.FileId)
+		_, err = db.Pool.Exec(context.Background(), "UPDATE files SET status = 'UPLOADED', url = $1 WHERE file_id = $2", url, *payload.FileId)
 
 		wg.Wait()
 		r.CommitMessages(context.Background(), m)

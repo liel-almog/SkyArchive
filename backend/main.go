@@ -17,7 +17,7 @@ func main() {
 
 	configs.InitEnv()
 
-	// We initialize the database at the beginning of our program
+	// We initialize the server at the beginning of our program
 	go server.Serve()
 
 	// Listen for the interrupt signal.

@@ -2,13 +2,13 @@ package repositories
 
 import (
 	"context"
+	"errors"
 	"sync"
 	"time"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/lielalmog/SkyArchive/backend/database"
 	"github.com/lielalmog/SkyArchive/backend/models"
-	"gopkg.in/errgo.v2/errors"
 )
 
 type FileRepository interface {

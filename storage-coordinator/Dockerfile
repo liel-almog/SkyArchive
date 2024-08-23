@@ -15,6 +15,7 @@ RUN go mod download
 RUN go build -o ./tmp/main .
 
 # Final stage
+
 FROM alpine:latest
 
 # Set working directory
@@ -29,4 +30,3 @@ EXPOSE 8080
 
 # Run the application
 CMD [ "./tmp/main" ]
-

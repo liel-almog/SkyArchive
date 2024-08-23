@@ -3,7 +3,7 @@ import { FilesTable } from "./FilesTable";
 import classes from "./download-files.module.scss";
 import { useGetFiles } from "./useDownloadFIles";
 
-export interface DownloadFilesProps {}
+export interface DownloadFilesProps { }
 
 export const DownloadFiles = () => {
   const { query } = useGetFiles();

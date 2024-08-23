@@ -22,6 +22,8 @@ export const columns = [
     header: "שם קובץ",
     cell: (info) => info.getValue(),
     size: 100,
+    sortingFn: "alphanumeric",
+    sortDescFirst: true,
   }),
   columnHelper.accessor("uploadedAt", {
     header: "תאריך העלאה",
@@ -30,17 +32,6 @@ export const columns = [
         .getValue()
         .toLocaleDateString("he-IL", { year: "numeric", month: "2-digit", day: "2-digit" }),
     size: 100,
-  }),
-  columnHelper.accessor("status", {
-    header: "סטטוס",
-    cell: (info) => {
-      const v = info.getValue();
-      if (v === "PROCESSING") {
-        return "בהעלאה";
-      } else if (v === "UPLOADED") {
-        return "הועלה";
-      }
-    },
   }),
   columnHelper.accessor("size", {
     header: "גודל",
