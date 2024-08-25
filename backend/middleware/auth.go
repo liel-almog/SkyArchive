@@ -7,7 +7,7 @@ import (
 	jwtware "github.com/gofiber/contrib/jwt"
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/lielalmog/SkyArchive/backend/configs"
+	"github.com/liel-almog/SkyArchive/backend/configs"
 )
 
 // Protected protect routes

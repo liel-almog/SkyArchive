@@ -5,7 +5,7 @@ import (
 	"sync"
 
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/lielalmog/SkyArchive/backend/configs"
+	"github.com/liel-almog/SkyArchive/backend/configs"
 )
 
 type JWTService interface {

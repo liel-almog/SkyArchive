@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"github.com/jackc/pgx/v5"
-	"github.com/lielalmog/SkyArchive/backend/database"
-	"github.com/lielalmog/SkyArchive/backend/models"
+	"github.com/liel-almog/SkyArchive/backend/database"
+	"github.com/liel-almog/SkyArchive/backend/models"
 	"gopkg.in/errgo.v2/errors"
 )
 

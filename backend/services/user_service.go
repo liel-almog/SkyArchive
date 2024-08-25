@@ -7,10 +7,10 @@ import (
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
-	"github.com/lielalmog/SkyArchive/backend/errors/apperrors"
-	"github.com/lielalmog/SkyArchive/backend/errors/pgerrors"
-	"github.com/lielalmog/SkyArchive/backend/models"
-	"github.com/lielalmog/SkyArchive/backend/repositories"
+	"github.com/liel-almog/SkyArchive/backend/errors/apperrors"
+	"github.com/liel-almog/SkyArchive/backend/errors/pgerrors"
+	"github.com/liel-almog/SkyArchive/backend/models"
+	"github.com/liel-almog/SkyArchive/backend/repositories"
 )
 
 type UserService interface {

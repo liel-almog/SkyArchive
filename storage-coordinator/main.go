@@ -3,7 +3,7 @@ package main
 import (
 	"sync"
 
-	"github.com/lielalmog/SkyArchive/storage-coordinator/configs"
+	"github.com/liel-almog/SkyArchive/storage-coordinator/configs"
 )
 
 const (

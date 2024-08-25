@@ -4,8 +4,8 @@ import (
 	"context"
 	"sync"
 
-	"github.com/lielalmog/SkyArchive/backend/database"
-	"github.com/lielalmog/SkyArchive/backend/models"
+	"github.com/liel-almog/SkyArchive/backend/database"
+	"github.com/liel-almog/SkyArchive/backend/models"
 )
 
 type UserRepository interface {

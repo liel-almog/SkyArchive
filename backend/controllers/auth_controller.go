@@ -5,10 +5,10 @@ import (
 	"sync"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/lielalmog/SkyArchive/backend/configs"
-	"github.com/lielalmog/SkyArchive/backend/errors/apperrors"
-	"github.com/lielalmog/SkyArchive/backend/models"
-	"github.com/lielalmog/SkyArchive/backend/services"
+	"github.com/liel-almog/SkyArchive/backend/configs"
+	"github.com/liel-almog/SkyArchive/backend/errors/apperrors"
+	"github.com/liel-almog/SkyArchive/backend/models"
+	"github.com/liel-almog/SkyArchive/backend/services"
 )
 
 type AuthController interface {

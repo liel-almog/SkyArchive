@@ -12,8 +12,8 @@ import (
 
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob"
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob/blob"
-	"github.com/lielalmog/SkyArchive/storage-coordinator/configs"
-	"github.com/lielalmog/SkyArchive/storage-coordinator/database"
+	"github.com/liel-almog/SkyArchive/storage-coordinator/configs"
+	"github.com/liel-almog/SkyArchive/storage-coordinator/database"
 	"github.com/segmentio/kafka-go"
 )
 

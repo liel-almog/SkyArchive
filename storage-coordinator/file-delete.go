@@ -8,7 +8,7 @@ import (
 	"sync"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob"
-	"github.com/lielalmog/SkyArchive/storage-coordinator/configs"
+	"github.com/liel-almog/SkyArchive/storage-coordinator/configs"
 	"github.com/segmentio/kafka-go"
 )
 

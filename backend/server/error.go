@@ -7,7 +7,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 	"github.com/jackc/pgx/v5/pgconn"
-	"github.com/lielalmog/SkyArchive/backend/errors/pgerrors"
+	"github.com/liel-almog/SkyArchive/backend/errors/pgerrors"
 )
 
 func errorHandler(ctx *fiber.Ctx, err error) error {

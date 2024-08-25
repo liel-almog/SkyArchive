@@ -2,7 +2,7 @@ package routes
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"github.com/lielalmog/SkyArchive/backend/controllers"
+	"github.com/liel-almog/SkyArchive/backend/controllers"
 )
 
 func NewFileRouter(router fiber.Router) {

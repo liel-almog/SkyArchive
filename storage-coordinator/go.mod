@@ -1,4 +1,4 @@
-module github.com/lielalmog/SkyArchive/storage-coordinator
+module github.com/liel-almog/SkyArchive/storage-coordinator
 
 go 1.21.5
 
