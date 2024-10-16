@@ -1,6 +1,8 @@
 package main
 
-import "context"
+import (
+	"context"
+)
 
 // StorageProvider is an interface for storage operations
 type StorageProvider interface {

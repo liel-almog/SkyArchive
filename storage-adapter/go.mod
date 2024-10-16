@@ -1,3 +1,3 @@
-module github.com/liel-almog/storage-adapter
+module github.com/liel-almog/SkyArchive/storage-adapter
 
 go 1.22.5
